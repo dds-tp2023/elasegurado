@@ -10,12 +10,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import dto.UsuarioDTO;
+import ui.login.InicioSesion;
 import ui.poliza.PolizaAlta1;
 
 @SuppressWarnings("serial")
 public class MenuProductorSeguro extends JPanel {
 	private JFrame ventana;
 	private GridBagConstraints gbc;
+	private UsuarioDTO usuario;
 	private JLabel lblUsuario;
 	private JLabel lblNombreUsuario;
 	private JButton btnAltaPoliza;
@@ -26,9 +29,10 @@ public class MenuProductorSeguro extends JPanel {
 	private JButton btnActualizarFactores;
 	private JButton btnSalir;
 	
-	public MenuProductorSeguro(JFrame ventana/*,JPanel panelInicioSesion, String nombreUsuario*/) {
+	public MenuProductorSeguro(JFrame ventana, UsuarioDTO usuario) {
 		this.ventana = ventana;
 		this.gbc = new GridBagConstraints();
+		this.usuario = usuario;
 		this.setLayout(new GridBagLayout());
 		this.armarPanel();
 	}
@@ -41,7 +45,7 @@ public class MenuProductorSeguro extends JPanel {
 		gbc.insets = new Insets(10, 10, 10, 10);
 		this.add(lblUsuario, gbc);
 		
-		lblNombreUsuario = new JLabel("PRUEBA"/*nombreUsuario*/);
+		lblNombreUsuario = new JLabel(usuario.getNombreUsuario());
 		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.WEST;
@@ -101,10 +105,9 @@ public class MenuProductorSeguro extends JPanel {
 		gbc.anchor = GridBagConstraints.CENTER;
 		this.add(btnSalir, gbc);
 		btnSalir.addActionListener(e -> {
-			//TODO: Terminar el funcionamiento del boton salir
-			/*ventana.setTitle("El Asegurado - Inicio de Sesión");
-			ventana.setContentPane(panelInicioSesion);
-			ventana.setVisible(true);*/
+			ventana.setTitle("El Asegurado - Inicio de Sesión");
+			ventana.setContentPane(new InicioSesion(ventana));
+			ventana.setVisible(true);
 		});
 	}
 }

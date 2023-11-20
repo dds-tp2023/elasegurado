@@ -17,7 +17,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import dto.UsuarioDTO;
+import enums.Rol;
+import gestores.GestorUsuario;
+import ui.menus.MenuProductorSeguro;
 import utils.DocumentFilterLimit;
+import utils.HibernateUtil;
 
 @SuppressWarnings("serial")
 public class InicioSesion extends JPanel {
@@ -30,6 +35,8 @@ public class InicioSesion extends JPanel {
 	private JPasswordField txtPassword;
 	private JButton btnIniciarSesion;
 	private JButton btnSalir;
+	
+	private GestorUsuario gestorUsuario = GestorUsuario.getInstancia();
 	
 	private Border defaultBorder = (new JTextField()).getBorder(); //Borde por defecto para usarlo en btnIniciarSesion
 	
@@ -89,9 +96,6 @@ public class InicioSesion extends JPanel {
 		gbc.anchor = GridBagConstraints.EAST;
 		this.add(btnIniciarSesion, gbc);
 		btnIniciarSesion.addActionListener(e -> {
-			/* TODO: Recuperar de la base de datos el usuario y setear 
-			 * la pantalla segun el usuario
-			 */
 			txtUsuario.setBorder(defaultBorder);
             txtPassword.setBorder(defaultBorder);
 			if(txtUsuario.getText().isBlank() || txtPassword.getPassword().length == 0) {
@@ -109,12 +113,19 @@ public class InicioSesion extends JPanel {
 					txtPassword.setBorder(redBorder);
 					txtPassword.requestFocus();
 				}
-			}/*else if(Si los datos no son validos es decir que no existe usuario) {
-				mensajeUsuarioOPasswordNoValidos();
-				txtUsuario.requestFocus();
 			}else {
-				
-			}*/
+				@SuppressWarnings("deprecation")
+				UsuarioDTO usuarioDTO = gestorUsuario.autenticar(txtUsuario.getText(), txtPassword.getText());
+				if(usuarioDTO == null) {
+					mensajeUsuarioOPasswordNoValidos();
+				}else {
+					if(usuarioDTO.getRol() == Rol.PRODUCTOR_SEGURO) {
+						ventana.setTitle("Menú - Productor de seguro");
+						ventana.setContentPane(new MenuProductorSeguro(ventana, usuarioDTO));
+						ventana.setVisible(true);
+					}
+				}
+			}
 		});
 		
 		btnSalir = new JButton("Salir");
@@ -124,7 +135,7 @@ public class InicioSesion extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		this.add(btnSalir, gbc);
 		btnSalir.addActionListener(e -> {
-			// TODO: Cerrar conexion con base de datos
+			HibernateUtil.shutdown();
 			System.exit(0);
 		});
 	}
