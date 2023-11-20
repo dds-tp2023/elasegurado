@@ -1,0 +1,5 @@
+package enums;
+
+public enum CondicionIVA {
+	SELECCIONAR, CONSUMIDOR_FINAL, RESPONSABLE_INSCRIPTO, SUJETO_EXENTO;
+}
