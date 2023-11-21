@@ -6,8 +6,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -26,8 +29,12 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
+import dto.AnioFabricacionDTO;
 import dto.ClienteDTO;
+import dto.MarcaVehiculoDTO;
+import dto.ModeloVehiculoDTO;
 import gestores.GestorCliente;
+import gestores.GestorParametroVehiculo;
 import gestores.GestorSubsistemaSiniestro;
 import ui.cliente.ClienteConsulta;
 import utils.DocumentFilterLimit;
@@ -88,13 +95,13 @@ public class PolizaAlta1 extends JPanel {
 	private JPanel panelDatosVehiculo;
 	private JLabel lblMarcaVehiculo;
 	private JLabel lblObligatorioMarcaVehiculo;
-	private JComboBox<String> cbMarcaVehiculo;//Cambiar el tipo String
+	private JComboBox<MarcaVehiculoDTO> cbMarcaVehiculo;
 	private JLabel lblModeloVehiculo;
 	private JLabel lblObligatorioModeloVehiculo;
-	private JComboBox<String> cbModeloVehiculo;//Cambiar el tipo String
+	private JComboBox<ModeloVehiculoDTO> cbModeloVehiculo;
 	private JLabel lblAnioVehiculo;
 	private JLabel lblObligatorioAnioVehiculo;
-	private JComboBox<String> cbAnioVehiculo; //Cambiar el tipo String
+	private JComboBox<AnioFabricacionDTO> cbAnioVehiculo;
 	private JLabel lblSumaAsegurada;
 	private JTextField txtSumaAsegurada;
 	private JLabel lblMotor;
@@ -138,8 +145,13 @@ public class PolizaAlta1 extends JPanel {
 	private Border defaultBorderDC = (new JDateChooser().getBorder()); //Border por defecto date chooser
 	
 	private GestorCliente gestorCliente = GestorCliente.getInstancia();
+	private GestorParametroVehiculo gestorParametroVehiculo = GestorParametroVehiculo.getInstancia();
 	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
 	private ClienteDTO clienteDTO;
+	
+	private MarcaVehiculoDTO marcaDefecto = new MarcaVehiculoDTO("SELECCIONAR");
+	private ModeloVehiculoDTO modeloDefecto = new ModeloVehiculoDTO("SELECCIONAR");
+	private AnioFabricacionDTO anioDefecto = new AnioFabricacionDTO("SELECCIONAR");
 	
 	public PolizaAlta1(JFrame ventana, JPanel panelMenu) {
 		this.ventana = ventana;
@@ -529,7 +541,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.insets = new Insets(10, 0, 10, 10);
 		panelDatosVehiculo.add(lblObligatorioMarcaVehiculo, gbcDatosVehiculo);
 		
-		cbMarcaVehiculo = new JComboBox<>();
+		cbMarcaVehiculo = new JComboBox<MarcaVehiculoDTO>();
 		gbcDatosVehiculo.gridx = 2;
 		gbcDatosVehiculo.gridy = 0;
 		gbcDatosVehiculo.weightx = 0.33;
@@ -537,6 +549,35 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.fill = GridBagConstraints.HORIZONTAL;
 		gbcDatosVehiculo.insets = new Insets(10, 10, 10, 10);
 		panelDatosVehiculo.add(cbMarcaVehiculo, gbcDatosVehiculo);
+		cbMarcaVehiculo.addItem(marcaDefecto);
+		List<MarcaVehiculoDTO> marcas = gestorParametroVehiculo.findAllMarcas();
+		marcas.sort((m1,m2) -> m1.getNombreMarca().compareTo(m2.getNombreMarca()));
+		for(MarcaVehiculoDTO m : marcas) {
+			cbMarcaVehiculo.addItem(m);
+		}
+		cbMarcaVehiculo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) {
+					cbModeloVehiculo.setEnabled(true);
+					cbModeloVehiculo.removeAllItems();
+					cbModeloVehiculo.addItem(modeloDefecto);
+					MarcaVehiculoDTO marcaSeleccionada = (MarcaVehiculoDTO)  cbMarcaVehiculo.getSelectedItem();
+					List<ModeloVehiculoDTO> modelos = marcaSeleccionada.getModelos();
+					modelos.sort((m1,m2) -> m1.getNombreModelo().compareTo(m2.getNombreModelo()));
+					for(ModeloVehiculoDTO m : modelos) {
+						cbModeloVehiculo.addItem(m);
+					}
+				}else {
+					cbModeloVehiculo.setEnabled(false);
+					cbModeloVehiculo.removeAllItems();
+					cbModeloVehiculo.addItem(modeloDefecto);
+					cbAnioVehiculo.setEnabled(false);
+					cbAnioVehiculo.removeAllItems();
+					cbAnioVehiculo.addItem(anioDefecto);
+				}
+			}
+		});
 		
 		lblModeloVehiculo = new JLabel("Modelo del Vehículo");
 		gbcDatosVehiculo.gridx = 3;
@@ -554,7 +595,8 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.insets = new Insets(10, 0, 10, 10);
 		panelDatosVehiculo.add(lblObligatorioModeloVehiculo, gbcDatosVehiculo);
 		
-		cbModeloVehiculo = new JComboBox<>();
+		cbModeloVehiculo = new JComboBox<ModeloVehiculoDTO>();
+		cbModeloVehiculo.setEnabled(false);
 		gbcDatosVehiculo.gridx = 5;
 		gbcDatosVehiculo.gridy = 0;
 		gbcDatosVehiculo.weightx = 0.33;
@@ -562,6 +604,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.fill = GridBagConstraints.HORIZONTAL;
 		gbcDatosVehiculo.insets = new Insets(10, 10, 10, 10);
 		panelDatosVehiculo.add(cbModeloVehiculo, gbcDatosVehiculo);
+		cbModeloVehiculo.addItem(modeloDefecto);
 		
 		lblAnioVehiculo = new JLabel("Año del Vehículo");
 		gbcDatosVehiculo.gridx = 6;
@@ -579,7 +622,8 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.insets = new Insets(10, 0, 10, 10);
 		panelDatosVehiculo.add(lblObligatorioAnioVehiculo, gbcDatosVehiculo);
 		
-		cbAnioVehiculo = new JComboBox<>();
+		cbAnioVehiculo = new JComboBox<AnioFabricacionDTO>();
+		cbAnioVehiculo.setEnabled(false);
 		gbcDatosVehiculo.gridx = 8;
 		gbcDatosVehiculo.gridy = 0;
 		gbcDatosVehiculo.weightx = 0.33;
@@ -587,6 +631,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.fill = GridBagConstraints.HORIZONTAL;
 		gbcDatosVehiculo.insets = new Insets(10, 10, 10, 10);
 		panelDatosVehiculo.add(cbAnioVehiculo, gbcDatosVehiculo);
+		cbAnioVehiculo.addItem(anioDefecto);
 		
 		lblSumaAsegurada = new JLabel("SumaAsegurada");
 		gbcDatosVehiculo.gridx = 0;
@@ -598,7 +643,6 @@ public class PolizaAlta1 extends JPanel {
 		
 		txtSumaAsegurada = new JTextField();
 		txtSumaAsegurada.setEditable(false);
-		txtSumaAsegurada.setText("$");
 		gbcDatosVehiculo.gridx = 2;
 		gbcDatosVehiculo.gridy = 1;
 		gbcDatosVehiculo.weightx = 0.33;
