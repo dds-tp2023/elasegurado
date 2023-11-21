@@ -14,6 +14,11 @@ public class LocalidadDTO {
 		this.nombreLocalidad = nombreLocalidad;
 	}
 
+	public LocalidadDTO(String nombreLocalidad) {
+		super();
+		this.nombreLocalidad = nombreLocalidad;
+	}
+	
 	public void setId(Integer id) {
 		this.id = id;
 	}

@@ -17,6 +17,11 @@ public class ProvinciaDTO {
 		this.localidades = localidades;
 	}
 
+	public ProvinciaDTO(String nombreProvincia) {
+		super();
+		this.nombreProvincia = nombreProvincia;
+	}
+
 	public Integer getId() {
 		return id;
 	}

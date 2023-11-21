@@ -31,9 +31,12 @@ import com.toedter.calendar.JDateChooser;
 
 import dto.AnioFabricacionDTO;
 import dto.ClienteDTO;
+import dto.LocalidadDTO;
 import dto.MarcaVehiculoDTO;
 import dto.ModeloVehiculoDTO;
+import dto.ProvinciaDTO;
 import gestores.GestorCliente;
+import gestores.GestorGeografico;
 import gestores.GestorParametroVehiculo;
 import gestores.GestorSubsistemaSiniestro;
 import ui.cliente.ClienteConsulta;
@@ -88,10 +91,10 @@ public class PolizaAlta1 extends JPanel {
 	private JPanel panelDomicilioRiesgo;
 	private JLabel lblProvinciaRiesgo;
 	private JLabel lblObligatorioProvinciaRiesgo;
-	private JComboBox<String> cbProvinciaRiesgo;//Cambiar el tipo String
+	private JComboBox<ProvinciaDTO> cbProvinciaRiesgo;
 	private JLabel lblLocalidadRiesgo;
 	private JLabel lblObligatorioLocalidadRiesgo;
-	private JComboBox<String> cbLocalidadRiesgo;//Cambiar el tipo String
+	private JComboBox<LocalidadDTO> cbLocalidadRiesgo;
 	private JPanel panelDatosVehiculo;
 	private JLabel lblMarcaVehiculo;
 	private JLabel lblObligatorioMarcaVehiculo;
@@ -147,8 +150,11 @@ public class PolizaAlta1 extends JPanel {
 	private GestorCliente gestorCliente = GestorCliente.getInstancia();
 	private GestorParametroVehiculo gestorParametroVehiculo = GestorParametroVehiculo.getInstancia();
 	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
-	private ClienteDTO clienteDTO;
+	private GestorGeografico gestorGeografico = GestorGeografico.getInstancia();
 	
+	private ClienteDTO clienteDTO;
+	private ProvinciaDTO provinciaDefecto = new ProvinciaDTO("SELECCIONAR");
+	private LocalidadDTO localidadDefecto = new LocalidadDTO("SELECCIONAR");
 	private MarcaVehiculoDTO marcaDefecto = new MarcaVehiculoDTO("SELECCIONAR");
 	private ModeloVehiculoDTO modeloDefecto = new ModeloVehiculoDTO("SELECCIONAR");
 	private AnioFabricacionDTO anioDefecto = new AnioFabricacionDTO("SELECCIONAR");
@@ -484,7 +490,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilioRiesgo.insets = new Insets(10, 0, 10, 10);
 		panelDomicilioRiesgo.add(lblObligatorioProvinciaRiesgo, gbcDomicilioRiesgo);
 		
-		cbProvinciaRiesgo = new JComboBox<>();
+		cbProvinciaRiesgo = new JComboBox<ProvinciaDTO>();
 		gbcDomicilioRiesgo.gridx = 2;
 		gbcDomicilioRiesgo.gridy = 0;
 		gbcDomicilioRiesgo.weightx = 0.5;
@@ -492,7 +498,32 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilioRiesgo.fill = GridBagConstraints.HORIZONTAL;
 		gbcDomicilioRiesgo.insets = new Insets(10, 10, 10, 10);
 		panelDomicilioRiesgo.add(cbProvinciaRiesgo, gbcDomicilioRiesgo);
-		//TODO: Cuando se selecciona una provincia debe habilitar cbLocalidadRiesgo
+		cbProvinciaRiesgo.addItem(provinciaDefecto);
+		List<ProvinciaDTO> provincias = gestorGeografico.findAllProvincias();
+		provincias.sort((p1,p2) -> p1.getNombreProvincia().compareTo(p2.getNombreProvincia()));
+		for(ProvinciaDTO p : provincias) {
+			cbProvinciaRiesgo.addItem(p);
+		}
+		cbProvinciaRiesgo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!cbProvinciaRiesgo.getSelectedItem().toString().equals("SELECCIONAR")) {
+					cbLocalidadRiesgo.setEnabled(true);
+					cbLocalidadRiesgo.removeAllItems();
+					cbLocalidadRiesgo.addItem(localidadDefecto);
+					ProvinciaDTO provinciaSeleccionada = (ProvinciaDTO) cbProvinciaRiesgo.getSelectedItem();
+					List<LocalidadDTO> localidades = provinciaSeleccionada.getLocalidades();
+					localidades.sort((l1,l2) -> l1.getNombreLocalidad().compareTo(l2.getNombreLocalidad()));
+					for(LocalidadDTO l : localidades) {
+						cbLocalidadRiesgo.addItem(l);
+					}
+				}else {
+					cbLocalidadRiesgo.setEnabled(false);
+					cbLocalidadRiesgo.removeAllItems();
+					cbLocalidadRiesgo.addItem(localidadDefecto);
+				}
+			}
+		});
 		
 		lblLocalidadRiesgo = new JLabel("Localidad");
 		gbcDomicilioRiesgo.gridx = 3;
@@ -510,7 +541,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilioRiesgo.insets = new Insets(10, 0, 10, 10);
 		panelDomicilioRiesgo.add(lblObligatorioLocalidadRiesgo, gbcDomicilioRiesgo);
 		
-		cbLocalidadRiesgo = new JComboBox<>();
+		cbLocalidadRiesgo = new JComboBox<LocalidadDTO>();
 		cbLocalidadRiesgo.setEnabled(false);
 		gbcDomicilioRiesgo.gridx = 5;
 		gbcDomicilioRiesgo.gridy = 0;
@@ -519,6 +550,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilioRiesgo.fill = GridBagConstraints.HORIZONTAL;
 		gbcDomicilioRiesgo.insets = new Insets(10, 10, 10, 10);
 		panelDomicilioRiesgo.add(cbLocalidadRiesgo, gbcDomicilioRiesgo);
+		cbLocalidadRiesgo.addItem(localidadDefecto);
 		
 		panelDatosVehiculo = new JPanel();
 		panelDatosVehiculo.setLayout(new GridBagLayout());

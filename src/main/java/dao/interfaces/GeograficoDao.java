@@ -1,8 +1,10 @@
 package dao.interfaces;
 
 import java.util.List;
-import dto.ProvinciaDTO;
+
+import dominio.Provincia;
 
 public interface GeograficoDao {
-	public List<ProvinciaDTO> getAllProvinciasConLocalidades();
+
+	public abstract List<Provincia> findAllProvincias();
 }
