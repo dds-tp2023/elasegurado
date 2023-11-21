@@ -47,7 +47,7 @@ INSERT INTO cliente(
 	eliminado, id_direccion)
 	VALUES ('54-00000001', 'Suarez', 'Sandra', 'DNI', '2011223344', '2020112233442', 'FEMENINO',
 		   '1960-12-27', 'RESPONSABLE_INSCRIPTO', 'sandrasuarez@gmail.com', 'CASADO', 'CONTADOR', TO_DATE('2023', 'YYYY'), 'ACTIVO',
-		   FALSE, 1);
+		   FALSE, 2);
 		   
 -- INSERT DE USUARIO
 INSERT INTO usuario(rol, nombre_usuario, contrasenia)

@@ -1,5 +1,7 @@
 package gestores;
 
+import enums.CantidadSiniestros;
+
 public final class GestorSubsistemaSiniestro {
 	private static GestorSubsistemaSiniestro instancia;
 	
@@ -13,5 +15,9 @@ public final class GestorSubsistemaSiniestro {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		throw new CloneNotSupportedException();
+	}
+	
+	public String getCantSiniestrosByNroCliente(String nroCliente) {
+		return CantidadSiniestros.NINGUNO.toString();
 	}
 }

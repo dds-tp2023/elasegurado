@@ -1,5 +1,7 @@
 package dao.interfaces;
 
-public interface ClienteDao {
+import dominio.Cliente;
 
+public interface ClienteDao {
+	public abstract Cliente findClienteById(Integer id);
 }

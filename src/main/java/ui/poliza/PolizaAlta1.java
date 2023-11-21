@@ -26,6 +26,9 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
+import dto.ClienteDTO;
+import gestores.GestorCliente;
+import gestores.GestorSubsistemaSiniestro;
 import ui.cliente.ClienteConsulta;
 import utils.DocumentFilterLimit;
 
@@ -133,6 +136,10 @@ public class PolizaAlta1 extends JPanel {
 	private Border defaultBorderTF = (new JTextField()).getBorder(); //Borde por defecto text field
 	private Border defaultBorderCB = (new JComboBox<String>()).getBorder(); //Borde por defecto combo box
 	private Border defaultBorderDC = (new JDateChooser().getBorder()); //Border por defecto date chooser
+	
+	private GestorCliente gestorCliente = GestorCliente.getInstancia();
+	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
+	private ClienteDTO clienteDTO;
 	
 	public PolizaAlta1(JFrame ventana, JPanel panelMenu) {
 		this.ventana = ventana;
@@ -416,9 +423,28 @@ public class PolizaAlta1 extends JPanel {
 		gbcCliente.fill = GridBagConstraints.NONE;
 		panelDatosCliente.add(btnBuscarCliente, gbcCliente);
 		btnBuscarCliente.addActionListener(e -> {
-			ventana.setTitle("Cliente - Consulta");
+			//TODO: ETAPA 8: Buscar Cliente
+			/*ventana.setTitle("Cliente - Consulta");
 			ventana.setContentPane(new ClienteConsulta(ventana, this));
-			ventana.setVisible(true);
+			ventana.setVisible(true);*/
+			clienteDTO = gestorCliente.findCliente(1);
+			if(clienteDTO != null) {
+				txtNumCliente.setText(clienteDTO.getNroCliente());
+				txtTipoDocumento.setText(clienteDTO.getTipoDocumento());
+				txtNumDocumento.setText(clienteDTO.getDocumento());
+				txtApellido.setText(clienteDTO.getApellido());
+				txtNombre.setText(clienteDTO.getNombre());
+				txtPais.setText(clienteDTO.getPais());
+				txtProvincia.setText(clienteDTO.getProvincia());
+				txtLocalidad.setText(clienteDTO.getLocalidad());
+				txtCodigoPostal.setText(clienteDTO.getCodigoPostal());
+				txtCalle.setText(clienteDTO.getCalle());
+				txtNumero.setText(clienteDTO.getNumero());
+				txtDpto.setText(clienteDTO.getDpto());
+				txtPiso.setText(clienteDTO.getPiso());
+				String cantSiniestros = gestorSubsistemaSiniestro.getCantSiniestrosByNroCliente(clienteDTO.getNroCliente());
+				txtNumSiniestros.setText(cantSiniestros);
+			}
 		});
 		
 		panelDomicilioRiesgo = new JPanel();
