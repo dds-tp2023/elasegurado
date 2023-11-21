@@ -10,7 +10,7 @@ public class DatosPolizaDTO {
 	private String motor;
 	private String chasis;
 	private String patente;
-	private Integer kmPorAnio;
+	private String kmPorAnio;
 	private List<Integer> idMedidasSeguridad;
 	private Integer idCantSiniestros;
 	private List<HijoDeclaradoDTO> hijosDeclarados;
@@ -18,7 +18,7 @@ public class DatosPolizaDTO {
 	public DatosPolizaDTO() {}
 
 	public DatosPolizaDTO(Integer idCliente, Integer idLocalidad, Integer idModelo, Integer idAnioFabricacion,
-			String motor, String chasis, String patente, Integer kmPorAnio, List<Integer> idMedidasSeguridad,
+			String motor, String chasis, String patente, String kmPorAnio, List<Integer> idMedidasSeguridad,
 			Integer idCantSiniestros, List<HijoDeclaradoDTO> hijosDeclarados) {
 		super();
 		this.idCliente = idCliente;
@@ -90,11 +90,11 @@ public class DatosPolizaDTO {
 		this.patente = patente;
 	}
 
-	public Integer getKmPorAnio() {
+	public String getKmPorAnio() {
 		return kmPorAnio;
 	}
 
-	public void setKmPorAnio(Integer kmPorAnio) {
+	public void setKmPorAnio(String kmPorAnio) {
 		this.kmPorAnio = kmPorAnio;
 	}
 

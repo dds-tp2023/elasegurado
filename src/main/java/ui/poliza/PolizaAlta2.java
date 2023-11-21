@@ -8,7 +8,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -24,6 +26,9 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
+
+import enums.EnumTipoCobertura;
+import enums.FormaPago;
 
 @SuppressWarnings("serial")
 public class PolizaAlta2 extends JPanel {
@@ -50,13 +55,13 @@ public class PolizaAlta2 extends JPanel {
 	private JPanel panelPolizaGenerar;
 	private JLabel lblTipoCobertura;
 	private JLabel lblObligatorioTipoCobertura;
-	private JComboBox<String> cbTipoCobertura; //Cambiar tipo String
+	private JComboBox<String> cbTipoCobertura;
 	private JLabel lblFechaInicio;
 	private JLabel lblObligatorioFechaInicio;
 	private JDateChooser dcFechaInicio;
 	private JLabel lblFormaPago;
 	private JLabel lblObligatorioFormaPago;
-	private JComboBox<String> cbFormaPago; //Cambiar tipo String
+	private JComboBox<String> cbFormaPago;
 	private JButton btnConfirmar;
 	private JButton btnLimpiar;
 	private JLabel lblPremioCalculo;
@@ -176,13 +181,24 @@ public class PolizaAlta2 extends JPanel {
 		gbcCobertura.insets = new Insets(10, 0, 10, 10);
 		panelCobertura.add(lblObligatorioTipoCobertura, gbcCobertura);
 		
-		cbTipoCobertura = new JComboBox<>();
+		cbTipoCobertura = new JComboBox<String>();
 		gbcCobertura.gridx = 2;
 		gbcCobertura.gridy = 0;
 		gbcCobertura.weightx = 0.33;
 		gbcCobertura.fill = GridBagConstraints.HORIZONTAL;
 		gbcCobertura.insets = new Insets(10, 10, 10, 10);
 		panelCobertura.add(cbTipoCobertura, gbcCobertura);
+		cbTipoCobertura.addItem("Seleccionar");
+		List<String> tiposCoberturas = new ArrayList<String>();
+		/*if(El vehiculo es mayor a 10 años solo pueden acceder a resp. civil) {
+			cbTipoCobertura.addItem(EnumTipoCobertura.RESPONSABILIDAD_CIVIL.toString());
+		}else {
+			Poner aca dentro lo que está debajo
+		}*/
+		for(EnumTipoCobertura t : EnumTipoCobertura.values()) {
+			tiposCoberturas.add(t.toString());
+		}
+		tiposCoberturas.sort((t1,t2) -> t1.compareTo(t2));
 		
 		lblFechaInicio = new JLabel("Fecha de inicio");
 		gbcCobertura.gridx = 3;
@@ -223,13 +239,18 @@ public class PolizaAlta2 extends JPanel {
 		gbcCobertura.insets = new Insets(10, 0, 10, 10);
 		panelCobertura.add(lblObligatorioFormaPago, gbcCobertura);
 		
-		cbFormaPago = new JComboBox<>();
+		cbFormaPago = new JComboBox<String>();
 		gbcCobertura.gridx = 8;
 		gbcCobertura.gridy = 0;
 		gbcCobertura.weightx = 0.33;
 		gbcCobertura.fill = GridBagConstraints.HORIZONTAL;
 		gbcCobertura.insets = new Insets(10, 10, 10, 10);
 		panelCobertura.add(cbFormaPago, gbcCobertura);
+		List<String> formasPago = new ArrayList<String>();
+		for(FormaPago fp : FormaPago.values()) {
+			formasPago.add(fp.toString());
+		}
+		formasPago.sort((f1,f2) -> f1.compareTo(f2));
 		
 		panelCoberturaBotones = new JPanel();
 		panelCoberturaBotones.setLayout(new GridBagLayout());
@@ -258,7 +279,8 @@ public class PolizaAlta2 extends JPanel {
 		gbcCoberturaBotones.anchor = GridBagConstraints.CENTER;
 		panelCoberturaBotones.add(btnLimpiar, gbcCoberturaBotones);
 		btnLimpiar.addActionListener(e -> {
-			//TODO: Limpiar los campos tipo cobertura y forma de pago
+			cbTipoCobertura.setSelectedIndex(0);
+			cbFormaPago.setSelectedIndex(0);
 			dcFechaInicio.setDate(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)));
 		});
 		

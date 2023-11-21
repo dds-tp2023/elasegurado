@@ -9,6 +9,7 @@ import org.hibernate.query.Query;
 
 import dao.interfaces.ParametroVehiculoDao;
 import dominio.AjusteModelo;
+import dominio.AnioFabricacion;
 import dominio.Marca;
 import dominio.Modelo;
 import dominio.SumaAsegurada;
@@ -68,4 +69,25 @@ public class ParametroVehiculoPGDao implements ParametroVehiculoDao {
 		return sumasAseguradas;
 	}
 
+	@Override
+	public Modelo findModeloById(Integer id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		Modelo modelo = session.find(Modelo.class, id);
+		
+		session.close();
+		
+		return modelo;
+	}
+
+	@Override
+	public AnioFabricacion findAnioFabricacionById(Integer id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		AnioFabricacion anioFabricacion = session.find(AnioFabricacion.class, id);
+		
+		session.close();
+		
+		return anioFabricacion;
+	}
 }

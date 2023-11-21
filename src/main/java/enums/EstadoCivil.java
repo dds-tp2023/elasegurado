@@ -1,5 +1,5 @@
 package enums;
 
 public enum EstadoCivil {
-	SELECCIONAR, CASADO, DIVORCIADO, SOLTERO, VIUDO;
+	CASADO, DIVORCIADO, SOLTERO, VIUDO;
 }

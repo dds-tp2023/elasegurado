@@ -1,5 +1,7 @@
 package dao.interfaces;
 
-public interface TipoCoberturaDao {
+import dominio.TipoCobertura;
 
+public interface TipoCoberturaDao {
+	public abstract TipoCobertura findTipoCoberturaById(Integer id);
 }

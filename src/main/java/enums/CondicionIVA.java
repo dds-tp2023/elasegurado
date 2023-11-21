@@ -1,5 +1,22 @@
 package enums;
 
-public enum CondicionIVA {
-	SELECCIONAR, CONSUMIDOR_FINAL, RESPONSABLE_INSCRIPTO, SUJETO_EXENTO;
+public enum CondicionIVA { 
+	CONSUMIDOR_FINAL{
+		@Override
+		public String toString() {
+			return "CONSUMIDOR FINAL";
+		}
+	}, 
+	RESPONSABLE_INSCRIPTO{
+		@Override
+		public String toString() {
+			return "RESPONSABLE INSCRIPTO";
+		}
+	}, 
+	SUJETO_EXENTO{
+		@Override
+		public String toString() {
+			return "SUJETO EXENTO";
+		}
+	};
 }
