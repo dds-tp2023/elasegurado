@@ -3,6 +3,7 @@ package dto;
 public class AnioFabricacionDTO {
 	private Integer id;
 	private String anio;
+	private SumaAseguradaDTO sumaAseguradaDTO;
 	
 	public AnioFabricacionDTO() {}
 	
@@ -11,10 +12,11 @@ public class AnioFabricacionDTO {
 		this.anio = anio;
 	}
 
-	public AnioFabricacionDTO(Integer id, String anio) {
+	public AnioFabricacionDTO(Integer id, String anio, SumaAseguradaDTO sumaAseguradaDTO) {
 		super();
 		this.id = id;
 		this.anio = anio;
+		this.sumaAseguradaDTO = sumaAseguradaDTO;
 	}
 
 	public Integer getId() {
@@ -31,6 +33,14 @@ public class AnioFabricacionDTO {
 
 	public void setAnio(String anio) {
 		this.anio = anio;
+	}
+
+	public SumaAseguradaDTO getSumaAseguradaDTO() {
+		return sumaAseguradaDTO;
+	}
+
+	public void setSumaAseguradaDTO(SumaAseguradaDTO sumaAseguradaDTO) {
+		this.sumaAseguradaDTO = sumaAseguradaDTO;
 	}
 
 	@Override

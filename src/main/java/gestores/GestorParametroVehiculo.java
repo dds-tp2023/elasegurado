@@ -46,8 +46,8 @@ public final class GestorParametroVehiculo {
 			List<ModeloVehiculoDTO> modelosDTO = new ArrayList<ModeloVehiculoDTO>(); 
 			for(Modelo unModelo : unaMarca.getModelos()) {
 				AjusteModeloDTO ajusteDTO = findAjusteModeloVigenteByIdModelo(unModelo.getId());
-				List<SumaAseguradaDTO> sumasAseguradasDTO = findSumasAseguradasByIdModelo(unModelo.getId());
-				ModeloVehiculoDTO m = new ModeloVehiculoDTO(unModelo.getId(), unModelo.getNombreModelo(),ajusteDTO,sumasAseguradasDTO);
+				List<AnioFabricacionDTO> aniosFabricacionDTO = findAniosFabricacionByIdModelo(unModelo.getId());
+				ModeloVehiculoDTO m = new ModeloVehiculoDTO(unModelo.getId(), unModelo.getNombreModelo(),ajusteDTO,aniosFabricacionDTO);
 				modelosDTO.add(m);
 			}
 			MarcaVehiculoDTO ma = new MarcaVehiculoDTO(unaMarca.getId(), unaMarca.getNombreMarca(), modelosDTO);
@@ -64,16 +64,16 @@ public final class GestorParametroVehiculo {
 		return ajusteDTO;
 	}
 	
-	private List<SumaAseguradaDTO> findSumasAseguradasByIdModelo(Integer id){
+	private List<AnioFabricacionDTO> findAniosFabricacionByIdModelo(Integer id){
 		factory = FactoryDao.getFactory(FactoryDao.PG_FACTORY);
 		parametroVehiculoDao = factory.getParametroVehiculoDao();
 		List<SumaAsegurada> sumasAseguradas = parametroVehiculoDao.findSumasAseguradasByIdModelo(id);
-		List<SumaAseguradaDTO> sumasAseguradasDTO = new ArrayList<SumaAseguradaDTO>();
+		List<AnioFabricacionDTO> aniosFabricacionDTO = new ArrayList<AnioFabricacionDTO>();
 		for(SumaAsegurada s : sumasAseguradas) {
-			AnioFabricacionDTO a = new AnioFabricacionDTO(s.getAnioFabricacion().getId(), s.getAnioFabricacion().getAnio());
-			SumaAseguradaDTO sumaAseguradaDTO = new SumaAseguradaDTO(s.getId(), s.getSumaAsegurada(), a);
-			sumasAseguradasDTO.add(sumaAseguradaDTO);
+			SumaAseguradaDTO sumaAseguradaDTO = new SumaAseguradaDTO(s.getId(), s.getSumaAsegurada().toString());
+			AnioFabricacionDTO a = new AnioFabricacionDTO(s.getAnioFabricacion().getId(), s.getAnioFabricacion().getAnio(),sumaAseguradaDTO);
+			aniosFabricacionDTO.add(a);
 		}
-		return sumasAseguradasDTO;
+		return aniosFabricacionDTO;
 	}
 }

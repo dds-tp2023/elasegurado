@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -35,6 +37,7 @@ import dto.LocalidadDTO;
 import dto.MarcaVehiculoDTO;
 import dto.ModeloVehiculoDTO;
 import dto.ProvinciaDTO;
+import dto.SumaAseguradaDTO;
 import gestores.GestorCliente;
 import gestores.GestorGeografico;
 import gestores.GestorParametroVehiculo;
@@ -587,27 +590,32 @@ public class PolizaAlta1 extends JPanel {
 		for(MarcaVehiculoDTO m : marcas) {
 			cbMarcaVehiculo.addItem(m);
 		}
-		cbMarcaVehiculo.addActionListener(new ActionListener() {
+		cbMarcaVehiculo.addItemListener(new ItemListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(!cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) {
-					cbModeloVehiculo.setEnabled(true);
-					cbModeloVehiculo.removeAllItems();
-					cbModeloVehiculo.addItem(modeloDefecto);
-					MarcaVehiculoDTO marcaSeleccionada = (MarcaVehiculoDTO)  cbMarcaVehiculo.getSelectedItem();
-					List<ModeloVehiculoDTO> modelos = marcaSeleccionada.getModelos();
-					modelos.sort((m1,m2) -> m1.getNombreModelo().compareTo(m2.getNombreModelo()));
-					for(ModeloVehiculoDTO m : modelos) {
-						cbModeloVehiculo.addItem(m);
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					if(!cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) {
+						cbModeloVehiculo.setEnabled(true);
+						cbModeloVehiculo.removeAllItems();
+						cbModeloVehiculo.addItem(modeloDefecto);
+						cbAnioVehiculo.removeAllItems();
+						cbAnioVehiculo.addItem(anioDefecto);
+						MarcaVehiculoDTO marcaSeleccionada = (MarcaVehiculoDTO)  cbMarcaVehiculo.getSelectedItem();
+						List<ModeloVehiculoDTO> modelos = marcaSeleccionada.getModelos();
+						modelos.sort((m1,m2) -> m1.getNombreModelo().compareTo(m2.getNombreModelo()));
+						for(ModeloVehiculoDTO m : modelos) {
+							cbModeloVehiculo.addItem(m);
+						}
+					}else {
+						cbModeloVehiculo.setEnabled(false);
+						cbModeloVehiculo.removeAllItems();
+						cbModeloVehiculo.addItem(modeloDefecto);
+						cbAnioVehiculo.setEnabled(false);
+						cbAnioVehiculo.removeAllItems();
+						cbAnioVehiculo.addItem(anioDefecto);
 					}
-				}else {
-					cbModeloVehiculo.setEnabled(false);
-					cbModeloVehiculo.removeAllItems();
-					cbModeloVehiculo.addItem(modeloDefecto);
-					cbAnioVehiculo.setEnabled(false);
-					cbAnioVehiculo.removeAllItems();
-					cbAnioVehiculo.addItem(anioDefecto);
 				}
+				
 			}
 		});
 		
@@ -637,6 +645,27 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.insets = new Insets(10, 10, 10, 10);
 		panelDatosVehiculo.add(cbModeloVehiculo, gbcDatosVehiculo);
 		cbModeloVehiculo.addItem(modeloDefecto);
+		cbModeloVehiculo.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					if(!cbModeloVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) {
+						cbAnioVehiculo.setEnabled(true);
+						cbAnioVehiculo.removeAllItems();
+						cbAnioVehiculo.addItem(anioDefecto);
+						ModeloVehiculoDTO modeloSeleccionado = (ModeloVehiculoDTO)  cbModeloVehiculo.getSelectedItem();
+						List<AnioFabricacionDTO> aniosFabricacion = modeloSeleccionado.getAniosFabricacion();
+						for(AnioFabricacionDTO af : aniosFabricacion) {
+							cbAnioVehiculo.addItem(af);
+						}
+					}else {
+						cbAnioVehiculo.setEnabled(false);
+						cbAnioVehiculo.removeAllItems();
+						cbAnioVehiculo.addItem(anioDefecto);
+					}
+				}
+			}
+		});
 		
 		lblAnioVehiculo = new JLabel("Año del Vehículo");
 		gbcDatosVehiculo.gridx = 6;
@@ -664,6 +693,20 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.insets = new Insets(10, 10, 10, 10);
 		panelDatosVehiculo.add(cbAnioVehiculo, gbcDatosVehiculo);
 		cbAnioVehiculo.addItem(anioDefecto);
+		cbAnioVehiculo.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					if(!cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) {
+						AnioFabricacionDTO anioFabricacion = (AnioFabricacionDTO) cbAnioVehiculo.getSelectedItem();
+						SumaAseguradaDTO sumaAsegurada = anioFabricacion.getSumaAseguradaDTO();
+						txtSumaAsegurada.setText(sumaAsegurada.getSumaAsegurada());
+					}else {
+						txtSumaAsegurada.setText("");
+					}
+				}
+			}
+		});
 		
 		lblSumaAsegurada = new JLabel("SumaAsegurada");
 		gbcDatosVehiculo.gridx = 0;

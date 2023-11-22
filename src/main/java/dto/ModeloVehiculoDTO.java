@@ -6,7 +6,7 @@ public class ModeloVehiculoDTO {
 	private Integer id;
 	private String nombreModelo;
 	private AjusteModeloDTO ajuste;
-	private List<SumaAseguradaDTO> sumaAseguradas;
+	private List<AnioFabricacionDTO> aniosFabricacion;
 	
 	public ModeloVehiculoDTO() {}
 	
@@ -15,12 +15,12 @@ public class ModeloVehiculoDTO {
 		this.nombreModelo = nombreModelo;
 	}
 
-	public ModeloVehiculoDTO(Integer id, String nombreModelo, AjusteModeloDTO ajuste, List<SumaAseguradaDTO> sumaAseguradas) {
+	public ModeloVehiculoDTO(Integer id, String nombreModelo, AjusteModeloDTO ajuste, List<AnioFabricacionDTO> aniosFabricacion) {
 		super();
 		this.id = id;
 		this.nombreModelo = nombreModelo;
 		this.ajuste = ajuste;
-		this.sumaAseguradas = sumaAseguradas;
+		this.aniosFabricacion = aniosFabricacion;
 	}
 
 	public Integer getId() {
@@ -47,12 +47,12 @@ public class ModeloVehiculoDTO {
 		this.ajuste = ajuste;
 	}
 
-	public List<SumaAseguradaDTO> getSumaAseguradas() {
-		return sumaAseguradas;
+	public List<AnioFabricacionDTO> getAniosFabricacion() {
+		return aniosFabricacion;
 	}
 
-	public void setSumaAseguradas(List<SumaAseguradaDTO> sumaAseguradas) {
-		this.sumaAseguradas = sumaAseguradas;
+	public void setAniosFabricacion(List<AnioFabricacionDTO> aniosFabricacion) {
+		this.aniosFabricacion = aniosFabricacion;
 	}
 
 	@Override

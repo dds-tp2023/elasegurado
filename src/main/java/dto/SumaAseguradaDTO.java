@@ -2,16 +2,14 @@ package dto;
 
 public class SumaAseguradaDTO {
 	private Integer id;
-	private Double sumaAsegurada;
-	private AnioFabricacionDTO anioFabricacion;
+	private String sumaAsegurada;
 
 	public SumaAseguradaDTO() {}
 
-	public SumaAseguradaDTO(Integer id, Double sumaAsegurada, AnioFabricacionDTO anioFabricacion) {
+	public SumaAseguradaDTO(Integer id, String sumaAsegurada) {
 		super();
 		this.id = id;
 		this.sumaAsegurada = sumaAsegurada;
-		this.anioFabricacion = anioFabricacion;
 	}
 
 	public Integer getId() {
@@ -22,19 +20,11 @@ public class SumaAseguradaDTO {
 		this.id = id;
 	}
 
-	public Double getSumaAsegurada() {
+	public String getSumaAsegurada() {
 		return sumaAsegurada;
 	}
 
-	public void setSumaAsegurada(Double sumaAsegurada) {
+	public void setSumaAsegurada(String sumaAsegurada) {
 		this.sumaAsegurada = sumaAsegurada;
-	}
-
-	public AnioFabricacionDTO getAnioFabricacion() {
-		return anioFabricacion;
-	}
-
-	public void setAnioFabricacion(AnioFabricacionDTO anioFabricacion) {
-		this.anioFabricacion = anioFabricacion;
 	}
 }
