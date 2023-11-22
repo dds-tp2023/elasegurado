@@ -10,8 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -38,6 +41,8 @@ import dto.MarcaVehiculoDTO;
 import dto.ModeloVehiculoDTO;
 import dto.ProvinciaDTO;
 import dto.SumaAseguradaDTO;
+import enums.EstadoCivil;
+import enums.Sexo;
 import gestores.GestorCliente;
 import gestores.GestorGeografico;
 import gestores.GestorParametroVehiculo;
@@ -134,9 +139,9 @@ public class PolizaAlta1 extends JPanel {
 	private JLabel lblFechaNacimiento;
 	private JDateChooser dcFechaNacimiento;
 	private JLabel lblSexo;
-	private JComboBox<String> cbSexo;//Cambiar el String
+	private JComboBox<String> cbSexo;
 	private JLabel lblEstadoCivil;
-	private JComboBox<String> cbEstadoCivil; //Cambiar el String
+	private JComboBox<String> cbEstadoCivil;
 	private JButton btnAgregar;
 	private JPanel panelHijosCargados;
 	private JTable tablaHijos;
@@ -919,13 +924,22 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosHijo.fill = GridBagConstraints.NONE;
 		panelDatosHijo.add(lblSexo, gbcDatosHijo);
 		
-		cbSexo = new JComboBox<>();
+		cbSexo = new JComboBox<String>();
 		gbcDatosHijo.gridx = 1;
 		gbcDatosHijo.gridy = 1;
 		gbcDatosHijo.weightx = 1;
 		gbcDatosHijo.anchor = GridBagConstraints.CENTER;
 		gbcDatosHijo.fill = GridBagConstraints.HORIZONTAL;
 		panelDatosHijo.add(cbSexo, gbcDatosHijo);
+		cbSexo.addItem("SELECCIONAR");
+		List<String> sexos = new ArrayList<String>();
+		for(Sexo s : Sexo.values()) {
+			sexos.add(s.toString());
+		}
+		sexos.sort((s1,s2) -> s1.compareTo(s2));
+		for(String s : sexos) {
+			cbSexo.addItem(s);
+		}
 		
 		lblEstadoCivil = new JLabel("Estado Civil");
 		gbcDatosHijo.gridx = 0;
@@ -935,13 +949,22 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosHijo.fill = GridBagConstraints.NONE;
 		panelDatosHijo.add(lblEstadoCivil, gbcDatosHijo);
 		
-		cbEstadoCivil = new JComboBox<>();
+		cbEstadoCivil = new JComboBox<String>();
 		gbcDatosHijo.gridx = 1;
 		gbcDatosHijo.gridy = 2;
 		gbcDatosHijo.weightx = 1;
 		gbcDatosHijo.anchor = GridBagConstraints.CENTER;
 		gbcDatosHijo.fill = GridBagConstraints.HORIZONTAL;
 		panelDatosHijo.add(cbEstadoCivil, gbcDatosHijo);
+		cbEstadoCivil.addItem("SELECCIONAR");
+		List<String> estadosCiviles = new ArrayList<String>();
+		for(EstadoCivil ec : EstadoCivil.values()) {
+			estadosCiviles.add(ec.toString());
+		}
+		estadosCiviles.sort((e1,e2) -> e1.compareTo(e2));
+		for(String e : estadosCiviles) {
+			cbEstadoCivil.addItem(e);
+		}
 		
 		btnAgregar = new JButton("Agregar");
 		gbcDatosHijo.gridx = 1;
@@ -953,16 +976,26 @@ public class PolizaAlta1 extends JPanel {
 			dcFechaNacimiento.setBorder(defaultBorderDC);
         	cbSexo.setBorder(defaultBorderCB);
         	cbEstadoCivil.setBorder(defaultBorderCB);
-			if(dcFechaNacimiento.getDate() == null) {//TODO: Falta agregar en el if sobre los combo box que no sean seleccionar
+			if(dcFechaNacimiento.getDate() == null || 
+					cbSexo.getSelectedItem().toString().equals("SELECCIONAR") ||
+							cbEstadoCivil.getSelectedItem().toString().equals("SELECCIONAR")) {
 				mensajeDatosObligatoriosHijoDeclarado();
 				Border redBorder = BorderFactory.createLineBorder(Color.RED);
         		if(dcFechaNacimiento.getDate() == null) dcFechaNacimiento.setBorder(redBorder);
-        		//TODO: Falta lo de los combos box
+        		if(cbSexo.getSelectedItem().toString().equals("SELECCIONAR")) cbSexo.setBorder(redBorder);
+        		if(cbEstadoCivil.getSelectedItem().toString().equals("SELECCIONAR")) cbEstadoCivil.setBorder(redBorder);
 			}else {
 				long anios = Duration.between(dcFechaNacimiento.getDate().toInstant(), Instant.now()).toDays()/365;
 				if(anios < 18 || anios > 30) {
 					mensajeHijoDeclaradoNoEstaEnRango();
-				}	
+				}else {
+					Date fechaSeleccionada = dcFechaNacimiento.getDate();
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					String fechaFormateada = sdf.format(fechaSeleccionada);
+					String sexo = cbSexo.getSelectedItem().toString();
+					String estadoCivil = cbEstadoCivil.getSelectedItem().toString();
+					modeloTablaHijos.addRow(new Object[] { fechaFormateada,sexo,estadoCivil });
+				}
 			}
 		});
 		
@@ -984,9 +1017,9 @@ public class PolizaAlta1 extends JPanel {
 		modeloTablaHijos.addColumn("Fecha de nacimiento");
 		modeloTablaHijos.addColumn("Sexo");
 		modeloTablaHijos.addColumn("Estado Civil");
-		for (int i = 0; i < 10; i++) {
+	/*	for (int i = 0; i < 10; i++) {
 			modeloTablaHijos.addRow(new Object[] { "" });
-		}
+		}*/
 		
 		tablaHijos = new JTable(modeloTablaHijos);
 		tablaHijos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -1040,15 +1073,24 @@ public class PolizaAlta1 extends JPanel {
         		if(txtMotor.getText().isBlank()) txtMotor.setBorder(redBorder);
         		if(txtChasis.getText().isBlank()) txtChasis.setBorder(redBorder);
         		if(txtKmPorAnio.getText().isBlank()) txtKmPorAnio.setBorder(redBorder);
-        		//TODO: Falta lo de los combos box poner en rojo
-        	}/**
-        	TODO: Falta un if para ver si ya existe una póliza vigente para algunos de los 
-        		siguientes valores: patente (si es distinto a nulo), motor y chasis. 
-        	*/
+        		if(cbProvinciaRiesgo.getSelectedItem().toString().equals("SELECCIONAR")) cbProvinciaRiesgo.setBorder(redBorder);
+        		if(cbLocalidadRiesgo.getSelectedItem().toString().equals("SELECCIONAR")) cbLocalidadRiesgo.setBorder(redBorder);
+        		if(cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbMarcaVehiculo.setBorder(redBorder);
+        		if(cbModeloVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbModeloVehiculo.setBorder(redBorder);
+        		if(cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbAnioVehiculo.setBorder(redBorder);
+        	}
         	else {
-        		ventana.setTitle("Póliza - Alta - 2");
-            	ventana.setContentPane(new PolizaAlta2(ventana,panelMenu, this));
-            	ventana.setVisible(true);
+        		/**
+            	TODO: Falta un if para ver si ya existe una póliza vigente para algunos de los 
+            		siguientes valores: patente (si es distinto a nulo), motor y chasis. 
+            	*/
+        		/*if() {
+        			mensajeExistePolizaVigente();
+        		}else {
+        			ventana.setTitle("Póliza - Alta - 2");
+                	ventana.setContentPane(new PolizaAlta2(ventana,panelMenu, this));
+                	ventana.setVisible(true);
+        		}*/
         	}
         });
         
@@ -1071,8 +1113,12 @@ public class PolizaAlta1 extends JPanel {
 	}
 	
 	private boolean noEstanTodosDatosObligatorios() {
-		//TODO: Falta ver si los combos box son distintos de seleccionar
-		return (txtMotor.getText().isBlank() || txtChasis.getText().isBlank() || txtKmPorAnio.getText().isBlank());
+		return (txtMotor.getText().isBlank() || txtChasis.getText().isBlank() || 
+				txtKmPorAnio.getText().isBlank() || cbProvinciaRiesgo.getSelectedItem().toString().equals("SELECCIONAR") ||
+				cbLocalidadRiesgo.getSelectedItem().toString().equals("SELECCIONAR") ||
+				cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR") ||
+				cbModeloVehiculo.getSelectedItem().toString().equals("SELECCIONAR") ||
+				cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR"));
 	}
 	
 	private void mensajeDatosObligatorios() {
@@ -1096,10 +1142,17 @@ public class PolizaAlta1 extends JPanel {
 	}
 	
 	private void mensajeExistePolizaVigente() {
-		String mensaje = "Ya existe una póliza vigente asociado a los siguiente valores:\n"
-				+ "	Patente: " + txtPatente.getText() + "\n"
-				+ "	Motor: " + txtMotor.getText() + "\n"
-				+ "	Chasis: " + txtChasis.getText();
+		String mensaje = "";
+		if(!txtPatente.getText().equals("")) {
+			mensaje = "Ya existe una póliza vigente asociado a los siguiente valores:\n"
+					+ "	Patente: " + txtPatente.getText() + "\n"
+					+ "	Motor: " + txtMotor.getText() + "\n"
+					+ "	Chasis: " + txtChasis.getText();
+		}else {
+			mensaje = "Ya existe una póliza vigente asociado a los siguiente valores:\n"
+					+ "	Motor: " + txtMotor.getText() + "\n"
+					+ "	Chasis: " + txtChasis.getText();
+		}
 		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
 	}
 }
