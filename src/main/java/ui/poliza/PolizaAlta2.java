@@ -6,7 +6,12 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,9 +32,22 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
+import dominio.Cliente;
+import dto.AnioFabricacionDTO;
+import dto.ClienteDTO;
 import dto.DatosPolizaDTO;
+import dto.GeneracionPolizaDTO;
+import dto.ModeloDTO;
+import dto.ProvinciaDTO;
+import dto.TipoCoberturaDTO;
 import enums.EnumTipoCobertura;
 import enums.FormaPago;
+import excepciones.DatosNoValidosException;
+import excepciones.ExistePolizaVigenteException;
+import gestores.GestorCliente;
+import gestores.GestorParametroVehiculo;
+import gestores.GestorPoliza;
+import gestores.GestorTipoCobertura;
 
 @SuppressWarnings("serial")
 public class PolizaAlta2 extends JPanel {
@@ -56,7 +74,7 @@ public class PolizaAlta2 extends JPanel {
 	private JPanel panelPolizaGenerar;
 	private JLabel lblTipoCobertura;
 	private JLabel lblObligatorioTipoCobertura;
-	private JComboBox<String> cbTipoCobertura;
+	private JComboBox<TipoCoberturaDTO> cbTipoCobertura;
 	private JLabel lblFechaInicio;
 	private JLabel lblObligatorioFechaInicio;
 	private JDateChooser dcFechaInicio;
@@ -113,8 +131,16 @@ public class PolizaAlta2 extends JPanel {
 	private JButton btnCancelar;
 	
 	private Border defaultBorderCB = (new JComboBox<String>()).getBorder(); //Borde por defecto combo box
+	private Border defaultBorderDC = (new JDateChooser().getBorder()); //Border por defecto date chooser
 	
 	private DatosPolizaDTO datosPoliza;
+	
+	private GestorParametroVehiculo gestorParametroVehiculo = GestorParametroVehiculo.getInstancia();
+	private GestorPoliza gestorPoliza = GestorPoliza.getInstancia();
+	private GestorCliente gestorCliente = GestorCliente.getInstancia();
+	private GestorTipoCobertura gestorTipoCobertura = GestorTipoCobertura.getInstancia();
+	
+	private TipoCoberturaDTO tipoCoberturaDefecto = new TipoCoberturaDTO("SELECCIONAR");
 	
 	public PolizaAlta2(JFrame ventana, JPanel panelMenu, JPanel panelPoliza1, DatosPolizaDTO datosPoliza) {
 		this.ventana = ventana;
@@ -185,24 +211,28 @@ public class PolizaAlta2 extends JPanel {
 		gbcCobertura.insets = new Insets(10, 0, 10, 10);
 		panelCobertura.add(lblObligatorioTipoCobertura, gbcCobertura);
 		
-		cbTipoCobertura = new JComboBox<String>();
+		cbTipoCobertura = new JComboBox<TipoCoberturaDTO>();
 		gbcCobertura.gridx = 2;
 		gbcCobertura.gridy = 0;
 		gbcCobertura.weightx = 0.33;
 		gbcCobertura.fill = GridBagConstraints.HORIZONTAL;
 		gbcCobertura.insets = new Insets(10, 10, 10, 10);
 		panelCobertura.add(cbTipoCobertura, gbcCobertura);
-		cbTipoCobertura.addItem("Seleccionar");
-		List<String> tiposCoberturas = new ArrayList<String>();
-		/*if(El vehiculo es mayor a 10 años solo pueden acceder a resp. civil) {
-			cbTipoCobertura.addItem(EnumTipoCobertura.RESPONSABILIDAD_CIVIL.toString());
+		cbTipoCobertura.addItem(tipoCoberturaDefecto);
+		List<TipoCoberturaDTO> tiposCoberturasDTO = gestorTipoCobertura.findAllTipoCobertura();
+		AnioFabricacionDTO anioDto = gestorParametroVehiculo.findAnioFabricacionById(datosPoliza.getIdAnioFabricacion());
+		if((LocalDate.now().getYear() - Integer.parseInt(anioDto.getAnio())) > 10) {
+			for(TipoCoberturaDTO unTipo : tiposCoberturasDTO) {
+				if(unTipo.getNombre().equals(EnumTipoCobertura.RESPONSABILIDAD_CIVIL.toString())) {
+					cbTipoCobertura.addItem(unTipo);
+				}
+			}
 		}else {
-			Poner aca dentro lo que está debajo
-		}*/
-		for(EnumTipoCobertura t : EnumTipoCobertura.values()) {
-			tiposCoberturas.add(t.toString());
+			tiposCoberturasDTO.sort((t1,t2) -> t1.getNombre().compareTo(t2.getNombre()));
+			for(TipoCoberturaDTO unTipo : tiposCoberturasDTO) {
+				cbTipoCobertura.addItem(unTipo);
+			}
 		}
-		tiposCoberturas.sort((t1,t2) -> t1.compareTo(t2));
 		
 		lblFechaInicio = new JLabel("Fecha de inicio");
 		gbcCobertura.gridx = 3;
@@ -250,11 +280,15 @@ public class PolizaAlta2 extends JPanel {
 		gbcCobertura.fill = GridBagConstraints.HORIZONTAL;
 		gbcCobertura.insets = new Insets(10, 10, 10, 10);
 		panelCobertura.add(cbFormaPago, gbcCobertura);
+		cbFormaPago.addItem("SELECCIONAR");
 		List<String> formasPago = new ArrayList<String>();
 		for(FormaPago fp : FormaPago.values()) {
 			formasPago.add(fp.toString());
 		}
 		formasPago.sort((f1,f2) -> f1.compareTo(f2));
+		for(String f : formasPago) {
+			cbFormaPago.addItem(f);
+		}
 		
 		panelCoberturaBotones = new JPanel();
 		panelCoberturaBotones.setLayout(new GridBagLayout());
@@ -274,6 +308,46 @@ public class PolizaAlta2 extends JPanel {
 		panelCoberturaBotones.add(btnConfirmar, gbcCoberturaBotones);
 		btnConfirmar.addActionListener(e -> {
 			//TODO: Agregar funcionamiento boton confirmar
+			cbTipoCobertura.setBorder(defaultBorderCB);
+			cbFormaPago.setBorder(defaultBorderCB);
+			dcFechaInicio.setBorder(defaultBorderDC);
+			if(noEstanTodosDatosObligatorios()) {
+        		mensajeDatosObligatorios();
+        		Border redBorder = BorderFactory.createLineBorder(Color.RED);
+        		if(cbTipoCobertura.getSelectedItem().toString().equals("SELECCIONAR")) cbTipoCobertura.setBorder(redBorder);
+        		if(dcFechaInicio.getDate() == null) dcFechaInicio.setBorder(redBorder);
+        		if(cbFormaPago.getSelectedItem().toString().equals("SELECCIONAR")) cbFormaPago.setBorder(redBorder);
+			}else {
+				Instant instantActual = Instant.now();
+				ZonedDateTime zonedDateTime = instantActual.atZone(ZoneId.systemDefault());
+				ZonedDateTime fechaFutura = zonedDateTime.plusMonths(1);
+				if(dcFechaInicio.getDate().toInstant().isBefore(instantActual) ||
+						dcFechaInicio.getDate().toInstant().isAfter(fechaFutura.toInstant())) {
+					mensajeFechaInicioVigenciaNoEstaEnRango();
+				}else {
+	       			
+					ClienteDTO clienteDTO = new ClienteDTO();
+	       			clienteDTO = gestorCliente.findCliente(datosPoliza.getIdCliente());
+	        		txtApellido.setText(clienteDTO.getApellido());
+	        		txtNombre.setText(clienteDTO.getNombre());
+	        		ModeloDTO modeloDTO = gestorParametroVehiculo.findModeloById(datosPoliza.getIdModelo());
+	        		txtMarcaVehiculo.setText(modeloDTO.getNombreMarca());
+	        		txtModeloVehiculo.setText(modeloDTO.getNombreModelo());
+	        		txtMotor.setText(datosPoliza.getMotor());
+	        		txtPatente.setText(datosPoliza.getPatente());
+	        		txtChasis.setText(datosPoliza.getChasis());
+	        		Date fechaSeleccionada = dcFechaInicio.getDate();
+	        		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					String fechaFormateada = sdf.format(fechaSeleccionada);
+	        		txtFechaInicioVigencia.setText(fechaFormateada);
+	        		zonedDateTime = dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault());
+					fechaFutura = zonedDateTime.plusMonths(6);
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	        		txtFechaFinVigencia.setText(fechaFutura.format(formatter));
+	        		txtSumaAsegurada.setText(datosPoliza.getSumaAsegurada());
+	        		
+				}
+			}
 		});
 		
 		btnLimpiar = new JButton("Limpiar");
@@ -662,6 +736,25 @@ public class PolizaAlta2 extends JPanel {
 		panelContenido.add(btnGenerar, gbcContenido);
 		btnGenerar.addActionListener(e -> {
 			//TODO: Hacer funcionamiento boton generar
+			/**
+			 * GeneracionPolizaDTO datosGeneracionPolizaDTO = new GeneracionPolizaDTO();
+					datosGeneracionPolizaDTO.setDatosPoliza(datosPoliza);
+					datosGeneracionPolizaDTO.setTipoCobertura(cbTipoCobertura.getSelectedItem().toString());
+					System.out.println(cbTipoCobertura.getSelectedItem().toString());
+					datosGeneracionPolizaDTO.setFechaInicioVigencia(dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+					System.out.println(dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+					datosGeneracionPolizaDTO.setFormaPago(cbFormaPago.getSelectedItem().toString());
+					
+					
+					boolean datosConfirmados = false;
+	        		try {
+						datosConfirmados = gestorPoliza.confirmarDatosPoliza(datosPoliza);
+					} catch (DatosNoValidosException e1) {
+						mensajeDatosNoValidos(e1.getMessage());
+					} catch (ExistePolizaVigenteException e1) {
+						mensajeExistePolizaVigente(e1.getMessage());
+					}
+			 */
 		});
 		
 		btnAtras = new JButton("Atrás");
@@ -691,4 +784,43 @@ public class PolizaAlta2 extends JPanel {
 			}
 		});
 	}
+	
+	private boolean noEstanTodosDatosObligatorios() {
+		return ( cbTipoCobertura.getSelectedItem().toString().equals("SELECCIONAR") ||
+				dcFechaInicio.getDate() == null ||
+				cbFormaPago.getSelectedItem().toString().equals("SELECCIONAR"));
+	}
+	
+	private void mensajeDatosObligatorios() {
+		String mensaje = "Los siguientes campos son obligatorios: 'Tipo cobertura','Fecha de inicio','Forma de Pago'";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	private void mensajeFechaInicioVigenciaNoEstaEnRango() {
+		String mensaje = "La fecha de inicio de vigencia debe ser mayor o igual a la fecha posterior a la actual y menor a un mes de la fecha actual";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	private void mensajeDatosNoValidos(String mensajeException) {
+		String mensaje = mensajeException
+				+ "-Ingresar todos los datos obligatorios" + "\n"
+				+ "-La fecha de inicio de vigencia debe ser mayor o igual a la fecha posterior a la actual y menor a un mes de la fecha actual";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	private void mensajeExistePolizaVigente(String mensajeException) {
+		String mensaje = "";
+		if(!datosPoliza.getPatente().equals("")) {
+			mensaje = mensajeException
+					+ "	Patente: " + datosPoliza.getPatente() + "\n"
+					+ "	Motor: " + datosPoliza.getMotor() + "\n"
+					+ "	Chasis: " + datosPoliza.getChasis();
+		}else {
+			mensaje = mensajeException
+					+ "	Motor: " + datosPoliza.getMotor() + "\n"
+					+ "	Chasis: " + datosPoliza.getChasis();
+		}
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+	
 }

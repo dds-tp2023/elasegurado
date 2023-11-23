@@ -6,12 +6,14 @@ import java.util.List;
 import dao.factory.FactoryDao;
 import dao.interfaces.ParametroVehiculoDao;
 import dominio.AjusteModelo;
+import dominio.AnioFabricacion;
 import dominio.Marca;
 import dominio.Modelo;
 import dominio.SumaAsegurada;
 import dto.AjusteModeloDTO;
 import dto.AnioFabricacionDTO;
 import dto.MarcaVehiculoDTO;
+import dto.ModeloDTO;
 import dto.ModeloVehiculoDTO;
 import dto.SumaAseguradaDTO;
 
@@ -75,5 +77,21 @@ public final class GestorParametroVehiculo {
 			aniosFabricacionDTO.add(a);
 		}
 		return aniosFabricacionDTO;
+	}
+
+	public AnioFabricacionDTO findAnioFabricacionById(Integer idAnioFabricacion) {
+		factory = FactoryDao.getFactory(FactoryDao.PG_FACTORY);
+		parametroVehiculoDao = factory.getParametroVehiculoDao();
+		AnioFabricacion anio = parametroVehiculoDao.findAnioFabricacionById(idAnioFabricacion);
+		AnioFabricacionDTO anioDTO = new AnioFabricacionDTO(anio.getAnio());
+		return anioDTO;
+	}
+
+	public ModeloDTO findModeloById(Integer idModelo) {
+		factory = FactoryDao.getFactory(FactoryDao.PG_FACTORY);
+		parametroVehiculoDao = factory.getParametroVehiculoDao();
+		Modelo modelo = parametroVehiculoDao.findModeloById(idModelo);
+		ModeloDTO modeloDTO = new ModeloDTO(modelo.getNombreModelo(), modelo.getMarca().getNombreMarca());
+		return modeloDTO;
 	}
 }

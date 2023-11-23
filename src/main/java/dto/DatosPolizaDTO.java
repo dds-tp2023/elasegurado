@@ -14,12 +14,13 @@ public class DatosPolizaDTO {
 	private List<String> medidasSeguridad;
 	private String cantSiniestros;
 	private List<HijoDeclaradoDTO> hijosDeclarados;
+	private String sumaAsegurada;
 
 	public DatosPolizaDTO() {}
 
 	public DatosPolizaDTO(Integer idCliente, Integer idLocalidad, Integer idModelo, Integer idAnioFabricacion,
 			String motor, String chasis, String patente, String kmPorAnio, List<String> medidasSeguridad,
-			String cantSiniestros, List<HijoDeclaradoDTO> hijosDeclarados) {
+			String cantSiniestros, List<HijoDeclaradoDTO> hijosDeclarados, String sumaAsegurada) {
 		super();
 		this.idCliente = idCliente;
 		this.idLocalidad = idLocalidad;
@@ -32,6 +33,7 @@ public class DatosPolizaDTO {
 		this.medidasSeguridad = medidasSeguridad;
 		this.cantSiniestros = cantSiniestros;
 		this.hijosDeclarados = hijosDeclarados;
+		this.sumaAsegurada = sumaAsegurada;
 	}
 
 	public Integer getIdCliente() {
@@ -121,4 +123,14 @@ public class DatosPolizaDTO {
 	public void setHijosDeclarados(List<HijoDeclaradoDTO> hijosDeclarados) {
 		this.hijosDeclarados = hijosDeclarados;
 	}
+
+	public String getSumaAsegurada() {
+		return sumaAsegurada;
+	}
+
+	public void setSumaAsegurada(String sumaAsegurada) {
+		this.sumaAsegurada = sumaAsegurada;
+	}
+
+	
 }

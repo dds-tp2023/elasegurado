@@ -1101,6 +1101,7 @@ public class PolizaAlta1 extends JPanel {
         		datosPolizaDTO.setPatente(txtPatente.getText());
         		datosPolizaDTO.setKmPorAnio(txtKmPorAnio.getText());
         		datosPolizaDTO.setCantSiniestros(txtNumSiniestros.getText());
+        		datosPolizaDTO.setSumaAsegurada(txtSumaAsegurada.getText());
         		List<HijoDeclaradoDTO> hijosDeclarados = new ArrayList<HijoDeclaradoDTO>();
         		for (int i = 0; i < modeloTablaHijos.getRowCount(); i++) {
         			DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");

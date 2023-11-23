@@ -4,16 +4,23 @@ import enums.EnumTipoCobertura;
 
 public class TipoCoberturaDTO {
 	private Integer id;
-	private EnumTipoCobertura nombre;
+	private String nombre;
 	private AjusteTipoCoberturaDTO ajuste;
 
 	public TipoCoberturaDTO() {}
 
-	public TipoCoberturaDTO(Integer id, EnumTipoCobertura nombre, AjusteTipoCoberturaDTO ajuste) {
+	public TipoCoberturaDTO(Integer id, String nombre, AjusteTipoCoberturaDTO ajuste) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
 		this.ajuste = ajuste;
+	}
+
+	
+	
+	public TipoCoberturaDTO(String nombre) {
+		super();
+		this.nombre = nombre;
 	}
 
 	public Integer getId() {
@@ -24,11 +31,11 @@ public class TipoCoberturaDTO {
 		this.id = id;
 	}
 
-	public EnumTipoCobertura getNombre() {
+	public String getNombre() {
 		return nombre;
 	}
 
-	public void setNombre(EnumTipoCobertura nombre) {
+	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
 
