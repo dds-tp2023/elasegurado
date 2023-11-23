@@ -5,22 +5,22 @@ import java.util.List;
 
 public class GeneracionPolizaDTO {
 	private DatosPolizaDTO datosPoliza;
-	private Integer idTipoCobertura;
+	private String tipoCobertura;
 	private LocalDate fechaInicioVigencia;
-	private Integer idFormaPago;
+	private String formaPago;
 	private Double premio;
 	private Double descuentos;
 	private List<CuotaDTO> cuotas;
 	
 	public GeneracionPolizaDTO() {}
 
-	public GeneracionPolizaDTO(DatosPolizaDTO datosPoliza, Integer idTipoCobertura, LocalDate fechaInicioVigencia,
-			Integer idFormaPago, Double premio, Double descuentos, List<CuotaDTO> cuotas) {
+	public GeneracionPolizaDTO(DatosPolizaDTO datosPoliza, String tipoCobertura, LocalDate fechaInicioVigencia,
+			String formaPago, Double premio, Double descuentos, List<CuotaDTO> cuotas) {
 		super();
 		this.datosPoliza = datosPoliza;
-		this.idTipoCobertura = idTipoCobertura;
+		this.tipoCobertura = tipoCobertura;
 		this.fechaInicioVigencia = fechaInicioVigencia;
-		this.idFormaPago = idFormaPago;
+		this.formaPago = formaPago;
 		this.premio = premio;
 		this.descuentos = descuentos;
 		this.cuotas = cuotas;
@@ -34,12 +34,12 @@ public class GeneracionPolizaDTO {
 		this.datosPoliza = datosPoliza;
 	}
 
-	public Integer getIdTipoCobertura() {
-		return idTipoCobertura;
+	public String getTipoCobertura() {
+		return tipoCobertura;
 	}
 
-	public void setIdTipoCobertura(Integer idTipoCobertura) {
-		this.idTipoCobertura = idTipoCobertura;
+	public void setTipoCobertura(String tipoCobertura) {
+		this.tipoCobertura = tipoCobertura;
 	}
 
 	public LocalDate getFechaInicioVigencia() {
@@ -50,12 +50,12 @@ public class GeneracionPolizaDTO {
 		this.fechaInicioVigencia = fechaInicioVigencia;
 	}
 
-	public Integer getIdFormaPago() {
-		return idFormaPago;
+	public String getFormaPago() {
+		return formaPago;
 	}
 
-	public void setIdFormaPago(Integer idFormaPago) {
-		this.idFormaPago = idFormaPago;
+	public void setFormaPago(String formaPago) {
+		this.formaPago = formaPago;
 	}
 
 	public Double getPremio() {

@@ -27,6 +27,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
+import dto.DatosPolizaDTO;
 import enums.EnumTipoCobertura;
 import enums.FormaPago;
 
@@ -113,10 +114,13 @@ public class PolizaAlta2 extends JPanel {
 	
 	private Border defaultBorderCB = (new JComboBox<String>()).getBorder(); //Borde por defecto combo box
 	
-	public PolizaAlta2(JFrame ventana, JPanel panelMenu, JPanel panelPoliza1) {
+	private DatosPolizaDTO datosPoliza;
+	
+	public PolizaAlta2(JFrame ventana, JPanel panelMenu, JPanel panelPoliza1, DatosPolizaDTO datosPoliza) {
 		this.ventana = ventana;
 		this.panelMenu = panelMenu;
 		this.panelPoliza1 = panelPoliza1;
+		this.datosPoliza = datosPoliza;
 		this.gbcContenido = new GridBagConstraints();
 		this.gbcCobertura = new GridBagConstraints();
 		this.gbcCoberturaBotones = new GridBagConstraints();

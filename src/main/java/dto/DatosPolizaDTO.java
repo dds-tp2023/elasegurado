@@ -11,15 +11,15 @@ public class DatosPolizaDTO {
 	private String chasis;
 	private String patente;
 	private String kmPorAnio;
-	private List<Integer> idMedidasSeguridad;
-	private Integer idCantSiniestros;
+	private List<String> medidasSeguridad;
+	private String cantSiniestros;
 	private List<HijoDeclaradoDTO> hijosDeclarados;
 
 	public DatosPolizaDTO() {}
 
 	public DatosPolizaDTO(Integer idCliente, Integer idLocalidad, Integer idModelo, Integer idAnioFabricacion,
-			String motor, String chasis, String patente, String kmPorAnio, List<Integer> idMedidasSeguridad,
-			Integer idCantSiniestros, List<HijoDeclaradoDTO> hijosDeclarados) {
+			String motor, String chasis, String patente, String kmPorAnio, List<String> medidasSeguridad,
+			String cantSiniestros, List<HijoDeclaradoDTO> hijosDeclarados) {
 		super();
 		this.idCliente = idCliente;
 		this.idLocalidad = idLocalidad;
@@ -29,8 +29,8 @@ public class DatosPolizaDTO {
 		this.chasis = chasis;
 		this.patente = patente;
 		this.kmPorAnio = kmPorAnio;
-		this.idMedidasSeguridad = idMedidasSeguridad;
-		this.idCantSiniestros = idCantSiniestros;
+		this.medidasSeguridad = medidasSeguridad;
+		this.cantSiniestros = cantSiniestros;
 		this.hijosDeclarados = hijosDeclarados;
 	}
 
@@ -98,20 +98,20 @@ public class DatosPolizaDTO {
 		this.kmPorAnio = kmPorAnio;
 	}
 
-	public List<Integer> getIdMedidasSeguridad() {
-		return idMedidasSeguridad;
+	public List<String> getMedidasSeguridad() {
+		return medidasSeguridad;
 	}
 
-	public void setIdMedidasSeguridad(List<Integer> idMedidasSeguridad) {
-		this.idMedidasSeguridad = idMedidasSeguridad;
+	public void setMedidasSeguridad(List<String> medidasSeguridad) {
+		this.medidasSeguridad = medidasSeguridad;
 	}
 
-	public Integer getIdCantSiniestros() {
-		return idCantSiniestros;
+	public String getCantSiniestros() {
+		return cantSiniestros;
 	}
 
-	public void setIdCantSiniestros(Integer idCantSiniestros) {
-		this.idCantSiniestros = idCantSiniestros;
+	public void setCantSiniestros(String cantSiniestros) {
+		this.cantSiniestros = cantSiniestros;
 	}
 
 	public List<HijoDeclaradoDTO> getHijosDeclarados() {

@@ -1,14 +1,19 @@
-package dominio;
+package dao;
 
 import org.junit.jupiter.api.Test;
 
+import dao.interfaces.ClienteDao;
 import dao.interfaces.implementaciones.ClientePGDao;
+import dominio.Cliente;
+import dominio.Localidad;
+import dominio.Pais;
+import dominio.Provincia;
 
 public class ClientePGDaoTest {
 
 	@Test
 	void findCliente() {
-		ClientePGDao dao = new ClientePGDao();
+		ClienteDao dao = new ClientePGDao();
 		Cliente cliente = dao.findClienteById(1);
 		System.out.println("nombre:"+cliente.getNombre());
 		Localidad l = cliente.getDireccion().getLocalidad();

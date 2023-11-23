@@ -4,16 +4,16 @@ import java.time.LocalDate;
 
 public class HijoDeclaradoDTO {
 	private LocalDate fechaNacimiento;
-	private Integer idSexo;
-	private Integer idEstadoCivil;
+	private String sexo;
+	private String estadoCivil;
 	
 	public HijoDeclaradoDTO() {}
 
-	public HijoDeclaradoDTO(LocalDate fechaNacimiento, Integer idSexo, Integer idEstadoCivil) {
+	public HijoDeclaradoDTO(LocalDate fechaNacimiento, String sexo, String estadoCivil) {
 		super();
 		this.fechaNacimiento = fechaNacimiento;
-		this.idSexo = idSexo;
-		this.idEstadoCivil = idEstadoCivil;
+		this.sexo = sexo;
+		this.estadoCivil = estadoCivil;
 	}
 
 	public LocalDate getFechaNacimiento() {
@@ -24,19 +24,19 @@ public class HijoDeclaradoDTO {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 
-	public Integer getIdSexo() {
-		return idSexo;
+	public String getSexo() {
+		return sexo;
 	}
 
-	public void setIdSexo(Integer idSexo) {
-		this.idSexo = idSexo;
+	public void setSexo(String sexo) {
+		this.sexo = sexo;
 	}
 
-	public Integer getIdEstadoCivil() {
-		return idEstadoCivil;
+	public String getEstadoCivil() {
+		return estadoCivil;
 	}
 
-	public void setIdEstadoCivil(Integer idEstadoCivil) {
-		this.idEstadoCivil = idEstadoCivil;
+	public void setEstadoCivil(String estadoCivil) {
+		this.estadoCivil = estadoCivil;
 	}
 }

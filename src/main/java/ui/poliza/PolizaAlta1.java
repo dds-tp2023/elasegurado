@@ -13,6 +13,8 @@ import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +38,8 @@ import com.toedter.calendar.JDateChooser;
 
 import dto.AnioFabricacionDTO;
 import dto.ClienteDTO;
+import dto.DatosPolizaDTO;
+import dto.HijoDeclaradoDTO;
 import dto.LocalidadDTO;
 import dto.MarcaVehiculoDTO;
 import dto.ModeloVehiculoDTO;
@@ -43,9 +47,12 @@ import dto.ProvinciaDTO;
 import dto.SumaAseguradaDTO;
 import enums.EstadoCivil;
 import enums.Sexo;
+import excepciones.DatosNoValidosException;
+import excepciones.ExistePolizaVigenteException;
 import gestores.GestorCliente;
 import gestores.GestorGeografico;
 import gestores.GestorParametroVehiculo;
+import gestores.GestorPoliza;
 import gestores.GestorSubsistemaSiniestro;
 import ui.cliente.ClienteConsulta;
 import utils.DocumentFilterLimit;
@@ -155,6 +162,7 @@ public class PolizaAlta1 extends JPanel {
 	private Border defaultBorderCB = (new JComboBox<String>()).getBorder(); //Borde por defecto combo box
 	private Border defaultBorderDC = (new JDateChooser().getBorder()); //Border por defecto date chooser
 	
+	private GestorPoliza gestorPoliza = GestorPoliza.getInstancia();
 	private GestorCliente gestorCliente = GestorCliente.getInstancia();
 	private GestorParametroVehiculo gestorParametroVehiculo = GestorParametroVehiculo.getInstancia();
 	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
@@ -817,9 +825,9 @@ public class PolizaAlta1 extends JPanel {
 		gbcDatosVehiculo.gridy = 2;
 		gbcDatosVehiculo.insets = new Insets(10, 0, 10, 10);
 		panelDatosVehiculo.add(lblObligatorioKmPorAnio, gbcDatosVehiculo);
-		
+        
 		txtKmPorAnio = new JTextField();
-		// Limitar la cantidad de caracteres usando un DocumentFilter
+		//Limitar la cantidad de caracteres usando un DocumentFilter
 		txtKmPorAnio.setDocument(new DocumentFilterLimit(9));
 		gbcDatosVehiculo.gridx = 5;
 		gbcDatosVehiculo.gridy = 2;
@@ -1080,17 +1088,60 @@ public class PolizaAlta1 extends JPanel {
         		if(cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbAnioVehiculo.setBorder(redBorder);
         	}
         	else {
-        		/**
-            	TODO: Falta un if para ver si ya existe una póliza vigente para algunos de los 
-            		siguientes valores: patente (si es distinto a nulo), motor y chasis. 
-            	*/
-        		/*if() {
-        			mensajeExistePolizaVigente();
-        		}else {
+        		DatosPolizaDTO datosPolizaDTO = new DatosPolizaDTO();
+        		datosPolizaDTO.setIdCliente(clienteDTO.getId());
+        		LocalidadDTO localidad = (LocalidadDTO) cbLocalidadRiesgo.getSelectedItem();
+        		datosPolizaDTO.setIdLocalidad(localidad.getId());
+        		ModeloVehiculoDTO modelo = (ModeloVehiculoDTO) cbModeloVehiculo.getSelectedItem();
+        		datosPolizaDTO.setIdModelo(modelo.getId());
+        		AnioFabricacionDTO anioFabricacion = (AnioFabricacionDTO) cbAnioVehiculo.getSelectedItem();
+        		datosPolizaDTO.setIdAnioFabricacion(anioFabricacion.getId());
+        		datosPolizaDTO.setMotor(txtMotor.getText());
+        		datosPolizaDTO.setChasis(txtChasis.getText());
+        		datosPolizaDTO.setPatente(txtPatente.getText());
+        		datosPolizaDTO.setKmPorAnio(txtKmPorAnio.getText());
+        		datosPolizaDTO.setCantSiniestros(txtNumSiniestros.getText());
+        		List<HijoDeclaradoDTO> hijosDeclarados = new ArrayList<HijoDeclaradoDTO>();
+        		for (int i = 0; i < modeloTablaHijos.getRowCount(); i++) {
+        			DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        			LocalDate fechaNacimiento = null;
+        			String sexo = null;
+        			String estadoCivil = null;
+        			HijoDeclaradoDTO hijoDeclarado = new HijoDeclaradoDTO();
+                    for (int j = 0; j < modeloTablaHijos.getColumnCount(); j++) {
+                        if(j==0) {
+                        	fechaNacimiento = LocalDate.parse(modeloTablaHijos.getValueAt(i, j).toString(),formato); 
+                        }if(j==1) {
+                        	sexo = modeloTablaHijos.getValueAt(i, j).toString();
+                        }else {
+                        	estadoCivil = modeloTablaHijos.getValueAt(i, j).toString();
+                        }
+                    }
+                    hijoDeclarado.setFechaNacimiento(fechaNacimiento);
+                    hijoDeclarado.setSexo(sexo);
+                    hijoDeclarado.setEstadoCivil(estadoCivil);
+                    hijosDeclarados.add(hijoDeclarado);
+                }
+        		datosPolizaDTO.setHijosDeclarados(hijosDeclarados);
+        		List<String> medidasSeguridad = new ArrayList<String>();
+        		if(chbAlarma.isSelected()) medidasSeguridad.add("tiene_alarma");
+        		if(chbGarage.isSelected()) medidasSeguridad.add("se_guarda_en_garage");
+        		if(chbRastreo.isSelected()) medidasSeguridad.add("posee_dispositivos_de_rastreo");
+        		if(chbTuercasAntirrobo.isSelected()) medidasSeguridad.add("posee_tuercas_antirrobo");
+        		datosPolizaDTO.setMedidasSeguridad(medidasSeguridad);
+        		boolean datosConfirmados = false;
+        		try {
+					datosConfirmados = gestorPoliza.confirmarDatosPoliza(datosPolizaDTO);
+				} catch (DatosNoValidosException e1) {
+					mensajeDatosNoValidos(e1.getMessage());
+				} catch (ExistePolizaVigenteException e1) {
+					mensajeExistePolizaVigente(e1.getMessage());
+				}
+        		if(datosConfirmados) {
         			ventana.setTitle("Póliza - Alta - 2");
-                	ventana.setContentPane(new PolizaAlta2(ventana,panelMenu, this));
+                	ventana.setContentPane(new PolizaAlta2(ventana,panelMenu, this, datosPolizaDTO));
                 	ventana.setVisible(true);
-        		}*/
+        		}
         	}
         });
         
@@ -1121,6 +1172,13 @@ public class PolizaAlta1 extends JPanel {
 				cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR"));
 	}
 	
+	private void mensajeDatosNoValidos(String mensajeException) {
+		String mensaje = mensajeException
+				+ "-Ingresar todos los datos obligatorios" + "\n"
+				+ "-La edad de los hijos declarados deben estar entre 18 y 30 años";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+	
 	private void mensajeDatosObligatorios() {
 		String mensaje = "Los siguientes campos son obligatorios: 'Provincia','Localidad','Marca del Vehículo','Modelo del Vehículo','Año del Vehículo','Motor','Chasis','Kilómetros por año'";
 		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -1141,15 +1199,15 @@ public class PolizaAlta1 extends JPanel {
 		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
 	}
 	
-	private void mensajeExistePolizaVigente() {
+	private void mensajeExistePolizaVigente(String mensajeException) {
 		String mensaje = "";
 		if(!txtPatente.getText().equals("")) {
-			mensaje = "Ya existe una póliza vigente asociado a los siguiente valores:\n"
+			mensaje = mensajeException
 					+ "	Patente: " + txtPatente.getText() + "\n"
 					+ "	Motor: " + txtMotor.getText() + "\n"
 					+ "	Chasis: " + txtChasis.getText();
 		}else {
-			mensaje = "Ya existe una póliza vigente asociado a los siguiente valores:\n"
+			mensaje = mensajeException
 					+ "	Motor: " + txtMotor.getText() + "\n"
 					+ "	Chasis: " + txtChasis.getText();
 		}
