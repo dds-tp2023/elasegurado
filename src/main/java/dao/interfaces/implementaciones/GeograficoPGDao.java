@@ -1,10 +1,12 @@
 package dao.interfaces.implementaciones;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import dao.interfaces.GeograficoDao;
+import dominio.AjusteLocalidad;
 import dominio.Localidad;
 import dominio.Provincia;
 import utils.HibernateUtil;
@@ -40,5 +42,21 @@ public class GeograficoPGDao implements GeograficoDao {
 		session.close();
 		
 		return localidad;
+	}
+
+	@Override
+	public AjusteLocalidad findAjusteLocalidadVigenteByIdLocalidad(Integer id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		Query<Localidad> query = session.createQuery("select l from Localidad l join fetch l.ajustes where l.id = :id ", Localidad.class);
+		query.setParameter("id", id);
+		Localidad localidad = query.getSingleResult();
+		AjusteLocalidad ajuste = null;
+		for(AjusteLocalidad a : localidad.getAjustes()) {
+			if(LocalDate.now().isAfter(a.getFechaInicioVigencia()) && LocalDate.now().isBefore(a.getFechaFinVigencia()) ) {
+				ajuste = a;
+			}
+		}
+		return ajuste;
 	}
 }

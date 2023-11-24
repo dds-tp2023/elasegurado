@@ -580,8 +580,8 @@ INSERT INTO ajuste_modelo (fecha_inicio_vigencia,fecha_fin_vigencia,valor_porcen
 INSERT INTO parametro_poliza (fecha_inicio_vigencia, fecha_fin_vigencia, porcentaje_por_cada_diez_mil_km,
 							 porcentaje_sin_siniestro, porcentaje_un_siniestro, porcentaje_dos_siniestro,
 							 porcentaje_mas_de_dos_siniestro, porcentaje_por_hijo_registrado, 
-							 descuento_por_unidad_adicional, valor_derecho_de_emision, id_registro_auditoria)
+							 descuento_por_unidad_adicional, descuento_por_pago_semestral,valor_derecho_de_emision, id_registro_auditoria)
 							 VALUES ('2023-11-15', '2024-11-15', 0.00840566,
 									0, 0.00925994, 0.01530689,
 									0.01157732, 0.00329591,
-									0.05678593, 364, 32);
+									0.05678593,0.25, 364, 32);

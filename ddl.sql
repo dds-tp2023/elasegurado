@@ -115,6 +115,7 @@ CREATE TABLE parametro_poliza (
 	porcentaje_mas_de_dos_siniestro FLOAT,
 	porcentaje_por_hijo_registrado FLOAT,
 	descuento_por_unidad_adicional FLOAT,
+	descuento_por_pago_semestral FLOAT,
 	valor_derecho_de_emision FLOAT,
 	id_registro_auditoria INTEGER,
 	CONSTRAINT fk_id_registro_auditoria FOREIGN KEY(id_registro_auditoria) REFERENCES registro_auditoria(id)

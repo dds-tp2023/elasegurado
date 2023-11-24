@@ -35,10 +35,13 @@ import com.toedter.calendar.JDateChooser;
 import dominio.Cliente;
 import dto.AnioFabricacionDTO;
 import dto.ClienteDTO;
+import dto.CuotaDTO;
 import dto.DatosPolizaDTO;
+import dto.DescuentosDTO;
 import dto.GeneracionPolizaDTO;
 import dto.ModeloDTO;
-import dto.ProvinciaDTO;
+import dto.PrimaDTO;
+import dto.PrimaYdescuentosDTO;
 import dto.TipoCoberturaDTO;
 import enums.EnumTipoCobertura;
 import enums.FormaPago;
@@ -134,6 +137,7 @@ public class PolizaAlta2 extends JPanel {
 	private Border defaultBorderDC = (new JDateChooser().getBorder()); //Border por defecto date chooser
 	
 	private DatosPolizaDTO datosPoliza;
+	private List<CuotaDTO> cuotas = new ArrayList<CuotaDTO>();
 	
 	private GestorParametroVehiculo gestorParametroVehiculo = GestorParametroVehiculo.getInstancia();
 	private GestorPoliza gestorPoliza = GestorPoliza.getInstancia();
@@ -307,17 +311,18 @@ public class PolizaAlta2 extends JPanel {
 		gbcCoberturaBotones.insets = new Insets( 10, 10, 10, 10);
 		panelCoberturaBotones.add(btnConfirmar, gbcCoberturaBotones);
 		btnConfirmar.addActionListener(e -> {
-			//TODO: Agregar funcionamiento boton confirmar
 			cbTipoCobertura.setBorder(defaultBorderCB);
 			cbFormaPago.setBorder(defaultBorderCB);
 			dcFechaInicio.setBorder(defaultBorderDC);
 			if(noEstanTodosDatosObligatorios()) {
+				btnGenerar.setEnabled(false);
         		mensajeDatosObligatorios();
         		Border redBorder = BorderFactory.createLineBorder(Color.RED);
         		if(cbTipoCobertura.getSelectedItem().toString().equals("SELECCIONAR")) cbTipoCobertura.setBorder(redBorder);
         		if(dcFechaInicio.getDate() == null) dcFechaInicio.setBorder(redBorder);
         		if(cbFormaPago.getSelectedItem().toString().equals("SELECCIONAR")) cbFormaPago.setBorder(redBorder);
 			}else {
+				btnGenerar.setEnabled(true);
 				Instant instantActual = Instant.now();
 				ZonedDateTime zonedDateTime = instantActual.atZone(ZoneId.systemDefault());
 				ZonedDateTime fechaFutura = zonedDateTime.plusMonths(1);
@@ -325,7 +330,14 @@ public class PolizaAlta2 extends JPanel {
 						dcFechaInicio.getDate().toInstant().isAfter(fechaFutura.toInstant())) {
 					mensajeFechaInicioVigenciaNoEstaEnRango();
 				}else {
-	       			
+					PrimaYdescuentosDTO primaYdescuentosDTO = gestorPoliza.calcularPrimaYdescuentos(cbFormaPago.getSelectedItem().toString(), datosPoliza.getIdCliente(), 
+							datosPoliza.getIdLocalidad(), datosPoliza.getIdModelo(),
+							Integer.parseInt(datosPoliza.getKmPorAnio()), datosPoliza.getMedidasSeguridad(),datosPoliza.getCantSiniestros(),
+							datosPoliza.getHijosDeclarados().size());
+					Double descuentosTotales = primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral() + primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales();
+					txtDescuento.setText(descuentosTotales.toString());
+					txtDerechosEmision.setText(primaYdescuentosDTO.getPrima().getValorDerechosEmision().toString());
+					txtPremioCalculo.setText(primaYdescuentosDTO.getPrima().getValorPremio().toString());
 					ClienteDTO clienteDTO = new ClienteDTO();
 	       			clienteDTO = gestorCliente.findCliente(datosPoliza.getIdCliente());
 	        		txtApellido.setText(clienteDTO.getApellido());
@@ -345,7 +357,47 @@ public class PolizaAlta2 extends JPanel {
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	        		txtFechaFinVigencia.setText(fechaFutura.format(formatter));
 	        		txtSumaAsegurada.setText(datosPoliza.getSumaAsegurada());
+	        		txtPremio.setText(primaYdescuentosDTO.getPrima().getValorPremio().toString());
 	        		
+	        		modeloTablaDescuentos.setRowCount(0);
+	        		Double descuentoMasDeUnaUnidad = primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales();
+	        		Double descuentoPagoSemestral = primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral();
+	        		modeloTablaDescuentos.addRow(new Object[] {"Descuento por más de una unidad",descuentoMasDeUnaUnidad});
+	        		modeloTablaDescuentos.addRow(new Object[] {"Descuento por pago semestral",descuentoPagoSemestral});
+	        		
+	        		Double montoTotal = primaYdescuentosDTO.getPrima().getValorDerechosEmision() + 
+	        				primaYdescuentosDTO.getPrima().getValorPremio() - primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral() -
+	        				primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales();
+	        		
+	        		modeloTablaDiaPago.setRowCount(0);
+	        		if(cbFormaPago.getSelectedItem().toString().equals("SEMESTRAL")) {
+	        			CuotaDTO cuota = new CuotaDTO();
+	        			cuota.setMonto(montoTotal);
+	        			Instant ultimoDiaPago =  dcFechaInicio.getDate().toInstant().minus(1, ChronoUnit.DAYS);
+	        			cuota.setUltimoDiaPago(ultimoDiaPago.atZone(ZoneId.systemDefault()).toLocalDate());
+	        			cuotas.add(cuota);
+	        			
+	        			ZonedDateTime zone = ultimoDiaPago.atZone(ZoneId.systemDefault());
+						String fechaConFormato = zone.format(formatter);
+	        			modeloTablaDiaPago.addRow(new Object[] {1,fechaConFormato,montoTotal});
+	        		}else {
+	        			double montoCuota = Math.round((montoTotal/6));
+	        			ZonedDateTime ultimoDiaPago =  dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault()).minusDays(1);
+	        			for(int i=1; i<=6;i++) {
+	        				CuotaDTO cuota = new CuotaDTO();
+		        			cuota.setMonto(montoCuota);
+		        			if(i==1) cuota.setUltimoDiaPago(ultimoDiaPago.toLocalDate());
+		        			else {
+		        				ultimoDiaPago = ultimoDiaPago.plusMonths(1);
+		        				cuota.setUltimoDiaPago(ultimoDiaPago.toLocalDate());
+		        			}
+		        			cuotas.add(cuota);
+		        			
+							String fechaConFormato = ultimoDiaPago.format(formatter);
+		        			modeloTablaDiaPago.addRow(new Object[] {i,fechaConFormato,montoCuota});
+	        			}
+	        		}
+	        		txtMontoAbonar.setText(montoTotal.toString());
 				}
 			}
 		});
@@ -735,26 +787,28 @@ public class PolizaAlta2 extends JPanel {
 		gbcContenido.fill = GridBagConstraints.NONE;
 		panelContenido.add(btnGenerar, gbcContenido);
 		btnGenerar.addActionListener(e -> {
-			//TODO: Hacer funcionamiento boton generar
-			/**
-			 * GeneracionPolizaDTO datosGeneracionPolizaDTO = new GeneracionPolizaDTO();
-					datosGeneracionPolizaDTO.setDatosPoliza(datosPoliza);
-					datosGeneracionPolizaDTO.setTipoCobertura(cbTipoCobertura.getSelectedItem().toString());
-					System.out.println(cbTipoCobertura.getSelectedItem().toString());
-					datosGeneracionPolizaDTO.setFechaInicioVigencia(dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-					System.out.println(dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-					datosGeneracionPolizaDTO.setFormaPago(cbFormaPago.getSelectedItem().toString());
-					
-					
-					boolean datosConfirmados = false;
-	        		try {
-						datosConfirmados = gestorPoliza.confirmarDatosPoliza(datosPoliza);
-					} catch (DatosNoValidosException e1) {
-						mensajeDatosNoValidos(e1.getMessage());
-					} catch (ExistePolizaVigenteException e1) {
-						mensajeExistePolizaVigente(e1.getMessage());
-					}
-			 */
+			GeneracionPolizaDTO datosGeneracionPolizaDTO = new GeneracionPolizaDTO();
+			datosGeneracionPolizaDTO.setDatosPoliza(datosPoliza);
+			Integer idTipoCobertura = ((TipoCoberturaDTO) cbTipoCobertura.getSelectedItem()).getId();
+			datosGeneracionPolizaDTO.setIdTipoCobertura(idTipoCobertura);
+			LocalDate fechaInicioVigencia = dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			datosGeneracionPolizaDTO.setFechaInicioVigencia(fechaInicioVigencia);
+			datosGeneracionPolizaDTO.setFormaPago(cbFormaPago.getSelectedItem().toString());
+			datosGeneracionPolizaDTO.setPremio(Double.parseDouble(txtPremio.getText()));
+			datosGeneracionPolizaDTO.setDescuentos(Double.parseDouble(txtDescuento.getText()));
+			datosGeneracionPolizaDTO.setCuotas(cuotas);		
+	        try {
+	        	gestorPoliza.generarPoliza(datosGeneracionPolizaDTO);
+	        	mensajePolizaCreada();
+	        	ventana.setTitle("Menú - Productor de seguro");
+				ventana.setContentPane(panelMenu);
+				ventana.setVisible(true);
+	        	
+			} catch (DatosNoValidosException e1) {
+				mensajeDatosNoValidos(e1.getMessage());
+			} catch (ExistePolizaVigenteException e1) {
+				mensajeExistePolizaVigente(e1.getMessage());
+			}
 		});
 		
 		btnAtras = new JButton("Atrás");
@@ -785,6 +839,11 @@ public class PolizaAlta2 extends JPanel {
 		});
 	}
 	
+	private void mensajePolizaCreada() {
+		String mensaje = "La póliza se ha generado correctamente y se pasará a emitir a PDF la póliza";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	private boolean noEstanTodosDatosObligatorios() {
 		return ( cbTipoCobertura.getSelectedItem().toString().equals("SELECCIONAR") ||
 				dcFechaInicio.getDate() == null ||

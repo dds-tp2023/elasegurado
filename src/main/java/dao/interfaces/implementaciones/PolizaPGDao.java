@@ -1,12 +1,16 @@
 package dao.interfaces.implementaciones;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import dao.interfaces.PolizaDao;
+import dominio.Cliente;
 import dominio.Poliza;
+import jakarta.persistence.PersistenceException;
 import utils.HibernateUtil;
 
 public class PolizaPGDao implements PolizaDao {
@@ -39,6 +43,37 @@ public class PolizaPGDao implements PolizaDao {
 		session.close();
 		
 		return poliza != null;
+	}
+
+	@Override
+	public List<Poliza> findPolizasVigentesByIdCliente(Integer id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		Query<Poliza> query = session.createQuery("select p from Poliza p where p.fechaInicioVigencia <= :date1 and p.fechaFinVigencia >= :date2 and p.cliente.id = :id", Poliza.class);
+		query.setParameter("date1", LocalDate.now());
+		query.setParameter("date2", LocalDate.now());
+		query.setParameter("id", id);
+		List<Poliza> polizas = query.getResultList();
+		
+		session.close();
+		
+		return polizas;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void save(Poliza poliza) {
+		 try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+		        Transaction transaction = session.beginTransaction();
+
+		        try {
+		            session.saveOrUpdate(poliza);
+		            transaction.commit();
+		        } 
+		        catch (PersistenceException e) {
+					transaction.rollback();
+				}
+		}	
 	}
 
 }

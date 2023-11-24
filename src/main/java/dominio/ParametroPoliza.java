@@ -47,6 +47,9 @@ public class ParametroPoliza implements Serializable{
 	@Column(name="descuento_por_unidad_adicional")
 	private Double descuentoPorUnidadAdicional;
 	
+	@Column(name="descuento_por_pago_semestral")
+	private Double descuentoPorPagoSemestral;
+	
 	@Column(name="valor_derecho_de_emision")
 	private Double valorDerechoDeEmision;
 	
@@ -59,7 +62,8 @@ public class ParametroPoliza implements Serializable{
 	public ParametroPoliza(Integer id, LocalDate fechaInicioVigencia, LocalDate fechaFinVigencia,
 			Double porcentajePorCadaDiezMilKm, Double porcentajeSinSiniestro, Double porcentajeUnSiniestro,
 			Double porcentajeDosSiniestro, Double porcentajeMasDeDosSiniestro, Double porcentajePorHijoRegistrado,
-			Double descuentoPorUnidadAdicional, Double valorDerechoDeEmision, RegistroAuditoria registroAuditoria) {
+			Double descuentoPorUnidadAdicional, Double descuentoPorPagoSemestral, Double valorDerechoDeEmision,
+			RegistroAuditoria registroAuditoria) {
 		super();
 		this.id = id;
 		this.fechaInicioVigencia = fechaInicioVigencia;
@@ -71,6 +75,7 @@ public class ParametroPoliza implements Serializable{
 		this.porcentajeMasDeDosSiniestro = porcentajeMasDeDosSiniestro;
 		this.porcentajePorHijoRegistrado = porcentajePorHijoRegistrado;
 		this.descuentoPorUnidadAdicional = descuentoPorUnidadAdicional;
+		this.descuentoPorPagoSemestral = descuentoPorPagoSemestral;
 		this.valorDerechoDeEmision = valorDerechoDeEmision;
 		this.registroAuditoria = registroAuditoria;
 	}
@@ -153,6 +158,14 @@ public class ParametroPoliza implements Serializable{
 
 	public void setDescuentoPorUnidadAdicional(Double descuentoPorUnidadAdicional) {
 		this.descuentoPorUnidadAdicional = descuentoPorUnidadAdicional;
+	}
+
+	public Double getDescuentoPorPagoSemestral() {
+		return descuentoPorPagoSemestral;
+	}
+
+	public void setDescuentoPorPagoSemestral(Double descuentoPorPagoSemestral) {
+		this.descuentoPorPagoSemestral = descuentoPorPagoSemestral;
 	}
 
 	public Double getValorDerechoDeEmision() {

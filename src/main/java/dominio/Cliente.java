@@ -2,6 +2,7 @@ package dominio;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import enums.CondicionCliente;
@@ -73,7 +74,7 @@ public class Cliente implements Serializable{
 	
 	private Boolean eliminado;
 	
-	@OneToMany(mappedBy="cliente")
+	@OneToMany(mappedBy="cliente",cascade = CascadeType.ALL)
 	private List<Poliza> poliza;
 	
 	@OneToOne(cascade = CascadeType.ALL,optional=false)
@@ -241,6 +242,10 @@ public class Cliente implements Serializable{
 
 	public void setPoliza(List<Poliza> poliza) {
 		this.poliza = poliza;
+	}
+	
+	public void addPoliza(Poliza p) {
+		this.poliza.add(p);
 	}
 
 	public Direccion getDireccion() {
