@@ -12,8 +12,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -50,7 +48,7 @@ public class Cuota implements Serializable{
 	
 	@Column(name="anio_abonado")
 	private String anioAbonado;
-
+	
 	public Cuota() {}
 
 	public Cuota(Integer id, Integer nroCuota, Double monto, LocalDate ultimoDiaPago, EstadoCuota estado,

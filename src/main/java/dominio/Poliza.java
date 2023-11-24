@@ -86,11 +86,11 @@ public class Poliza implements Serializable{
 	private AnioFabricacion anioFabricacion;
 	
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "id_poliza", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "id_poliza", referencedColumnName = "id")
 	private List<HijoDeclarado> hijosDeclarados;
 	
 	@OneToMany
-	@JoinColumn(name = "id_poliza", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "id_poliza", referencedColumnName = "id")
 	private List<SolicitudPoliza> solicitudesPoliza;
 	
 	@ManyToOne(optional = false)

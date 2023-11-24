@@ -214,7 +214,7 @@ CREATE TABLE solicitud_poliza (
 	id_anio_fabricacion INTEGER NOT NULL,
 	id_modelo INTEGER NOT NULL,
 	id_registro_auditoria INTEGER,
-	id_poliza INTEGER NOT NULL,
+	id_poliza INTEGER,
 	CONSTRAINT fk_id_anio_fabricacion FOREIGN KEY(id_anio_fabricacion) REFERENCES anio_fabricacion(id),
 	CONSTRAINT fk_id_modelo FOREIGN KEY(id_modelo) REFERENCES modelo(id),
 	CONSTRAINT fk_id_registro_auditoria FOREIGN KEY(id_registro_auditoria) REFERENCES registro_auditoria(id),
@@ -222,7 +222,7 @@ CREATE TABLE solicitud_poliza (
 );
 
 CREATE TABLE posee (
-	id_poliza INTEGER NOT NULL,
+	id_poliza INTEGER,
 	id_medida_seguridad INTEGER NOT NULL,
 	CONSTRAINT pk_id_poliza_id_medida_seguridad PRIMARY KEY(id_poliza, id_medida_seguridad),
 	CONSTRAINT fk_id_poliza FOREIGN KEY(id_poliza) REFERENCES poliza(id),
@@ -242,7 +242,7 @@ CREATE TABLE hijo_declarado (
 	fecha_nacimiento DATE,
 	sexo VARCHAR(255) CHECK (sexo IN ('MASCULINO','FEMENINO')),
 	estado_civil VARCHAR(255) CHECK (estado_civil IN ('SOLTERO','CASADO','VIUDO', 'DIVORCIADO')),
-	id_poliza INTEGER NOT NULL,
+	id_poliza INTEGER,
 	id_solicitud_poliza INTEGER,
 	CONSTRAINT fk_id_poliza FOREIGN KEY(id_poliza) REFERENCES poliza(id),
 	CONSTRAINT fk_id_solicitud_poliza FOREIGN KEY(id_solicitud_poliza) REFERENCES solicitud_poliza(id)
@@ -259,7 +259,7 @@ CREATE TABLE cuota (
 	bonificacion_pago_adelantado FLOAT,
 	anio_abonado VARCHAR(4),
 	monto FLOAT,
-	id_poliza INTEGER NOT NULL,
+	id_poliza INTEGER,
 	id_pago INTEGER,
 	CONSTRAINT fk_id_poliza FOREIGN KEY(id_poliza) REFERENCES poliza(id),
 	CONSTRAINT fk_id_pago FOREIGN KEY(id_pago) REFERENCES pago(id)

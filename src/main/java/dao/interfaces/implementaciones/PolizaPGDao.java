@@ -8,7 +8,6 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import dao.interfaces.PolizaDao;
-import dominio.Cliente;
 import dominio.Poliza;
 import jakarta.persistence.PersistenceException;
 import utils.HibernateUtil;
@@ -20,23 +19,21 @@ public class PolizaPGDao implements PolizaDao {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		
 		Poliza poliza = null;
-		LocalDate date = LocalDate.now();
+		LocalDate date = LocalDate.now().plusDays(1);
 		if(patente != null) {
-			String hql = "from Poliza p where p.patente = :patente and p.motor = :motor and p.chasis = :chasis and p.fechaInicioVigencia <= :date1 and p.fechaFinVigencia >= :date2";
+			String hql = "from Poliza p where p.patente = :patente and p.motor = :motor and p.chasis = :chasis and :date between p.fechaInicioVigencia and p.fechaFinVigencia";
 			Query<Poliza> query = session.createQuery(hql,Poliza.class);
 			query.setParameter("patente", patente);
 			query.setParameter("motor", motor);
 			query.setParameter("chasis", chasis);
-			query.setParameter("date1", date);
-			query.setParameter("date2", date);
+			query.setParameter("date", date);
 			poliza = query.getSingleResultOrNull();
 		}else {
-			String hql = "from Poliza p where p.motor = :motor and p.chasis = :chasis and p.fechaInicioVigencia <= :date1 and p.fechaFinVigencia >= :date2";
+			String hql = "from Poliza p where p.motor = :motor and p.chasis = :chasis and :date between p.fechaInicioVigencia and p.fechaFinVigencia";
 			Query<Poliza> query = session.createQuery(hql,Poliza.class);
 			query.setParameter("motor", motor);
 			query.setParameter("chasis", chasis);
-			query.setParameter("date1", date);
-			query.setParameter("date2", date);
+			query.setParameter("date", date);
 			poliza = query.getSingleResultOrNull();
 		}
 		
@@ -60,14 +57,16 @@ public class PolizaPGDao implements PolizaDao {
 		return polizas;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void save(Poliza poliza) {
 		 try (Session session = HibernateUtil.getSessionFactory().openSession()) {
 		        Transaction transaction = session.beginTransaction();
 
 		        try {
-		            session.saveOrUpdate(poliza);
+		        	session.merge(poliza.getCliente());
+		        	session.merge(poliza);
+		        	//session.persist(poliza);
+		            session.flush();
 		            transaction.commit();
 		        } 
 		        catch (PersistenceException e) {
