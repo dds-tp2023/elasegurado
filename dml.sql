@@ -24,30 +24,48 @@ INSERT INTO direccion (calle, nro, id_localidad)
 INSERT INTO direccion (calle, nro, id_localidad) 
 	VALUES ('Caseros', '530', 2);
 INSERT INTO direccion (calle, nro, id_localidad) 
-	VALUES ('25 de mayo', '1234', 3);
+	VALUES ('25 de Mayo', '1234', 1);
+INSERT INTO direccion (calle, nro, id_localidad) 
+	VALUES ('25 de Mayo', '5600', 3);
+INSERT INTO direccion (calle, nro, id_localidad) 
+	VALUES ('Las Heras', '4800', 2);
 
 -- INSERT DE CLIENTE
 INSERT INTO cliente(
 	nro_cliente, apellido, nombre, tipo_documento, nro_documento, cuil, sexo,
 	fecha_nacimiento, condicion_de_iva, email, estado_civil, profesion, anio_registro, condicion,
 	eliminado, id_direccion)
-	VALUES ('54-00000000', 'Rodriguez', 'Lucas', 'DNI', '3012345678', '2030123456782', 'MASCULINO',
-		   '1970-10-20', 'CONSUMIDOR_FINAL', 'lucasrod@gmail.com', 'SOLTERO', 'ABOGADO', TO_DATE('2023', 'YYYY'), 'NORMAL',
+	VALUES ('54-00000000', 'Rodriguez', 'Lucas', 'DNI', '30123456', '20301234562', 'MASCULINO',
+		   '1970-10-20', 'CONSUMIDOR_FINAL', 'lucasrod@gmail.com', 'SOLTERO', 'ABOGADO', TO_DATE('2023', 'YYYY'), 'ACTIVO',
 		   FALSE, 1);
 INSERT INTO cliente(
 	nro_cliente, apellido, nombre, tipo_documento, nro_documento, cuil, sexo,
 	fecha_nacimiento, condicion_de_iva, email, estado_civil, profesion, anio_registro, condicion,
 	eliminado, id_direccion)
-	VALUES ('54-00000002', 'Martinez', 'Carlos', 'DNI', '3587654321', '2035876543212', 'MASCULINO',
-		   '1980-11-13', 'SUJETO_EXENTO', 'carlosmart@gmail.com', 'DIVORCIADO', 'ARQUITECTO', TO_DATE('2023', 'YYYY'), 'PLATA',
+	VALUES ('54-00000002', 'Martinez', 'Carlos', 'DNI', '35876543', '20358765432', 'MASCULINO',
+		   '1980-11-13', 'SUJETO_EXENTO', 'carlosmart@gmail.com', 'DIVORCIADO', 'ARQUITECTO', TO_DATE('2023', 'YYYY'), 'ACTIVO',
 		   FALSE, 3);		   
 INSERT INTO cliente(
 	nro_cliente, apellido, nombre, tipo_documento, nro_documento, cuil, sexo,
 	fecha_nacimiento, condicion_de_iva, email, estado_civil, profesion, anio_registro, condicion,
 	eliminado, id_direccion)
-	VALUES ('54-00000001', 'Suarez', 'Sandra', 'DNI', '2011223344', '2020112233442', 'FEMENINO',
-		   '1960-12-27', 'RESPONSABLE_INSCRIPTO', 'sandrasuarez@gmail.com', 'CASADO', 'CONTADOR', TO_DATE('2023', 'YYYY'), 'ACTIVO',
+	VALUES ('54-00000001', 'Suarez', 'Sandra', 'DNI', '20112233', '27201122332', 'FEMENINO',
+		   '1966-11-27', 'RESPONSABLE_INSCRIPTO', 'sandrasuarez@gmail.com', 'CASADO', 'CONTADOR', TO_DATE('2023', 'YYYY'), 'ACTIVO',
 		   FALSE, 2);
+INSERT INTO cliente(
+	nro_cliente, apellido, nombre, tipo_documento, nro_documento, cuil, sexo,
+	fecha_nacimiento, condicion_de_iva, email, estado_civil, profesion, anio_registro, condicion,
+	eliminado, id_direccion)
+	VALUES ('54-00000003', 'Suipacha', 'Alejandra', 'DNI', '23152236', '27231522362', 'FEMENINO',
+		   '1960-12-27', 'RESPONSABLE_INSCRIPTO', 'salejandra@gmail.com', 'CASADO', 'CONTADOR', TO_DATE('2023', 'YYYY'), 'ACTIVO',
+		   FALSE, 4);
+INSERT INTO cliente(
+	nro_cliente, apellido, nombre, tipo_documento, nro_documento, cuil, sexo,
+	fecha_nacimiento, condicion_de_iva, email, estado_civil, profesion, anio_registro, condicion,
+	eliminado, id_direccion)
+	VALUES ('54-00000004', 'Martinez', 'Lucila', 'DNI', '41152238', '27411522382', 'FEMENINO',
+		   '1998-09-27', 'RESPONSABLE_INSCRIPTO', 'mlucila@gmail.com', 'CASADO', 'CONTADOR', TO_DATE('2023', 'YYYY'), 'ACTIVO',
+		   FALSE, 5);
 		   
 -- INSERT DE USUARIO
 INSERT INTO usuario(rol, nombre_usuario, contrasenia)

@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import dto.UsuarioDTO;
+import ui.cliente.ClienteConsulta;
 import ui.login.InicioSesion;
 import ui.poliza.PolizaAlta1;
 
@@ -59,7 +60,7 @@ public class MenuProductorSeguro extends JPanel {
 		this.add(btnAltaPoliza, gbc);
 		btnAltaPoliza.addActionListener(e -> {
 			ventana.setTitle("Póliza - Alta - 1");
-			ventana.setContentPane(new PolizaAlta1(ventana,this));
+			ventana.setContentPane(new PolizaAlta1(ventana,this,usuario));
 			ventana.setVisible(true);
 		});
 		
@@ -83,6 +84,11 @@ public class MenuProductorSeguro extends JPanel {
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		this.add(btnConsultaCliente, gbc);
+		btnConsultaCliente.addActionListener(e -> {
+			ventana.setTitle("Cliente - Consulta");
+			ventana.setContentPane(new ClienteConsulta(ventana,this,usuario));
+			ventana.setVisible(true);
+		});
 		
 		btnGenerarPropuestas = new JButton("Generar Propuestas de Renovación");
 		btnGenerarPropuestas.setPreferredSize(new Dimension(350,50));

@@ -1,9 +1,13 @@
 package ui.cliente;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,9 +20,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
+import dto.BusquedaClienteDTO;
+import dto.ClienteDTO;
+import dto.UsuarioDTO;
+import enums.Sexo;
+import enums.TipoDocumento;
+import gestores.GestorCliente;
 import ui.menus.MenuProductorSeguro;
+import ui.poliza.PolizaAlta1;
 import utils.DocumentFilterLimit;
 
 @SuppressWarnings("serial")
@@ -49,10 +61,16 @@ public class ClienteConsulta extends JPanel {
 	private JScrollPane scrollTablaResultadoBusqueda;
 	private JButton btnSeleccionar;
 	private JButton btnCancelar;
-	
-	public ClienteConsulta(JFrame ventana, JPanel panelPolizaAlta) {
+
+	private GestorCliente gestorCliente = GestorCliente.getInstancia();
+
+	private ClienteDTO clienteDTO;
+	private UsuarioDTO usuarioDTO;
+
+	public ClienteConsulta(JFrame ventana, JPanel panelPolizaAlta,UsuarioDTO usuarioDTO) {
 		this.ventana = ventana;
 		this.panelPolizaAlta = panelPolizaAlta;
+		this.usuarioDTO = usuarioDTO;
 		this.gbc = new GridBagConstraints();
 		this.gbcBusquedaCliente = new GridBagConstraints();
 		this.gbcBusquedaClienteBotones = new GridBagConstraints();
@@ -63,7 +81,7 @@ public class ClienteConsulta extends JPanel {
 		this.armarPaneles();
 		this.armarContenido();
 	}
-	
+
 	private void armarPaneles() {
 		panelBusquedaCliente.setLayout(new GridBagLayout());
 		panelBusquedaCliente.setBorder(BorderFactory.createTitledBorder("Búsqueda de Cliente"));
@@ -72,16 +90,16 @@ public class ClienteConsulta extends JPanel {
 		gbc.gridwidth = 2;
 		gbc.weightx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.insets = new Insets( 10, 10, 10, 10);
+		gbc.insets = new Insets(10, 10, 10, 10);
 		this.add(panelBusquedaCliente, gbc);
-		
+
 		panelResultadoBusqueda.setLayout(new GridBagLayout());
 		panelResultadoBusqueda.setBorder(BorderFactory.createTitledBorder("Resultado de Búsqueda"));
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		this.add(panelResultadoBusqueda, gbc);
 	}
-	
+
 	private void armarContenido() {
 		lblNumCliente = new JLabel("Número Cliente");
 		gbcBusquedaCliente.gridx = 0;
@@ -92,7 +110,7 @@ public class ClienteConsulta extends JPanel {
 		
 		txtNumCliente = new JTextField();
 		// Limitar la cantidad de caracteres usando un DocumentFilter
-		txtNumCliente.setDocument(new DocumentFilterLimit(4));
+		txtNumCliente.setDocument(new DocumentFilterLimit(11));
 		gbcBusquedaCliente.gridx = 1;
 		gbcBusquedaCliente.gridy = 0;
 		gbcBusquedaCliente.weightx = 0.33;
@@ -151,6 +169,17 @@ public class ClienteConsulta extends JPanel {
 		gbcBusquedaCliente.fill = GridBagConstraints.HORIZONTAL;
 		panelBusquedaCliente.add(cbTipoDocumento, gbcBusquedaCliente);
 		
+		cbTipoDocumento.addItem("SELECCIONAR");
+		List<String> tiposDocumentos = new ArrayList<String>();
+		for(TipoDocumento tipoDoc : TipoDocumento.values()) {
+			tiposDocumentos.add(tipoDoc.toString());
+		}
+		tiposDocumentos.sort((s1,s2) -> s1.compareTo(s2));
+		for(String s : tiposDocumentos) {
+			cbTipoDocumento.addItem(s);
+		}
+		cbTipoDocumento.setSelectedItem("DNI");
+		
 		lblNumDocumeto = new JLabel("Número Documento");
 		gbcBusquedaCliente.gridx = 2;
 		gbcBusquedaCliente.gridy = 1;
@@ -185,15 +214,36 @@ public class ClienteConsulta extends JPanel {
 		gbcBusquedaClienteBotones.insets = new Insets(10, 10, 10, 10);
 		panelBusquedaClienteBotones.add(btnBuscar, gbcBusquedaClienteBotones);
 		btnBuscar.addActionListener(e -> {
-			//TODO: Falta que complete la tabla si hay resultados
-			String mensaje = "No existen clientes que cumplen con los criterios ingresados";
-			int confirmado = JOptionPane.showOptionDialog(this, mensaje, "INFORMACIÓN", JOptionPane.YES_NO_OPTION,
-					JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Dar de Alta Cliente", "Aceptar" }, "Dar de Alta Cliente");
-			if (confirmado == 0) {
-				ventana.setTitle("Cliente - Alta");
-				ventana.setContentPane(new MenuProductorSeguro(ventana));//TODO: Cambiar por alta cliente
-				ventana.setVisible(true);
+			
+			if(!ingresoAlMenosUnCriterio()){
+				mensajeCriterioDeBusqueda();
 			}
+			else {
+				BusquedaClienteDTO criterios = new BusquedaClienteDTO();
+				criterios.setNroCliente(txtNumCliente.getText());
+				criterios.setApellido(txtApellido.getText());
+				criterios.setNombre(txtNombre.getText());
+				criterios.setTipoDocumento(cbTipoDocumento.getSelectedItem().toString());
+				criterios.setDocumento(txtNumDocumento.getText());
+				List<ClienteDTO> clientesDTO = gestorCliente.buscarClienteSegunCriterio(criterios);
+				if(clientesDTO.size()==0) {
+					String mensaje = "No existen clientes que cumplen con los criterios ingresados";
+					int confirmado = JOptionPane.showOptionDialog(this, mensaje, "INFORMACIÓN", JOptionPane.YES_NO_OPTION,
+							JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Dar de Alta Cliente", "Aceptar" }, "Dar de Alta Cliente");
+					if (confirmado == 0) {
+						ventana.setTitle("Menú - Productor de seguro");
+						ventana.setContentPane(new MenuProductorSeguro(ventana,usuarioDTO));
+						ventana.setVisible(true);
+					}
+				}else {
+					modeloTablaResultadoBusqueda.setRowCount(0);
+					for(ClienteDTO c : clientesDTO) {
+						modeloTablaResultadoBusqueda.addRow(new Object[] { c.getId(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
+					}
+				}
+			
+			}
+			
 		});
 		
 		btnLimpiar = new JButton("Limpiar");
@@ -207,7 +257,8 @@ public class ClienteConsulta extends JPanel {
 			txtApellido.setText("");
 			txtNombre.setText("");
 			txtNumDocumento.setText("");
-			//TODO: Falta que el combo box muestre valor por defecto "DNI"
+			cbTipoDocumento.setSelectedIndex(0);
+			//TODO: Falta que el combo box muestre valor por defecto "DNI" /ahi lo puse en la linea de arriba
 		});
 		
 		modeloTablaResultadoBusqueda = new DefaultTableModel() {
@@ -250,7 +301,15 @@ public class ClienteConsulta extends JPanel {
 		gbc.fill = GridBagConstraints.NONE;
 		this.add(btnSeleccionar, gbc);
 		btnSeleccionar.addActionListener(e -> {
-			// TODO: Agregar funcionamiento boton seleccionar
+			if(tablaResultadoBusqueda.getSelectedRow() == -1) {
+				mensajeSeleccionarCliente();
+			}else {
+				Integer id = (Integer) tablaResultadoBusqueda.getValueAt(tablaResultadoBusqueda.getSelectedRow(), 0);
+				ClienteDTO clienteDTO = gestorCliente.findCliente(id); 
+				ventana.setTitle("Póliza - Alta - 1");
+				ventana.setContentPane(new PolizaAlta1(ventana, new MenuProductorSeguro(ventana,usuarioDTO), usuarioDTO, clienteDTO));
+				ventana.setVisible(true);
+			}
 		});
 		
 		btnCancelar = new JButton("Cancelar");
@@ -270,4 +329,24 @@ public class ClienteConsulta extends JPanel {
 			}
 		});
 	}
+
+	private boolean ingresoAlMenosUnCriterio() {
+		int contador=0;
+		if(!txtNumCliente.getText().isBlank()) contador++;
+		if(!txtApellido.getText().isBlank()) contador++;
+		if(!txtNombre.getText().isBlank()) contador++;
+		if(!cbTipoDocumento.getSelectedItem().toString().equals("SELECCIONAR")) contador++;
+		if(!txtNumDocumento.getText().isBlank()) contador++;
+		return contador!=0;
+	}
+
+	private void mensajeCriterioDeBusqueda() {
+		String mensaje = "Debe ingresar al menos un criterio de busqueda";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+	private void mensajeSeleccionarCliente() {
+		String mensaje = "Debe seleccionar un cliente";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+
 }

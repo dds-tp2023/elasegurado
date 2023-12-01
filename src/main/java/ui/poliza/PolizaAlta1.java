@@ -45,6 +45,7 @@ import dto.MarcaVehiculoDTO;
 import dto.ModeloVehiculoDTO;
 import dto.ProvinciaDTO;
 import dto.SumaAseguradaDTO;
+import dto.UsuarioDTO;
 import enums.EstadoCivil;
 import enums.Sexo;
 import excepciones.DatosNoValidosException;
@@ -175,9 +176,35 @@ public class PolizaAlta1 extends JPanel {
 	private ModeloVehiculoDTO modeloDefecto = new ModeloVehiculoDTO("SELECCIONAR");
 	private AnioFabricacionDTO anioDefecto = new AnioFabricacionDTO("SELECCIONAR");
 	
-	public PolizaAlta1(JFrame ventana, JPanel panelMenu) {
+	private UsuarioDTO usuarioDTO;
+	
+	public PolizaAlta1(JFrame ventana, JPanel panelMenu,UsuarioDTO usuarioDTO) {
 		this.ventana = ventana;
 		this.panelMenu = panelMenu;
+		this.usuarioDTO = usuarioDTO;
+		this.gbcContenido = new GridBagConstraints();
+		this.gbcCliente = new GridBagConstraints();
+		this.gbcDomicilio = new GridBagConstraints();
+		this.gbcPoliza = new GridBagConstraints();
+		this.gbcDomicilioRiesgo = new GridBagConstraints();
+		this.gbcDatosVehiculo = new GridBagConstraints();
+		this.gbcMedidasSeguridad = new GridBagConstraints();
+		this.gbcDeclaracionHijos = new GridBagConstraints();
+		this.gbcDatosHijo = new GridBagConstraints();
+		this.gbcHijosCargados = new GridBagConstraints();
+		this.setLayout(new BorderLayout());
+		this.panelContenido = new JPanel();
+		this.panelDatosCliente = new JPanel();
+		this.panelDatosPoliza = new JPanel();
+		this.armarPaneles();
+		this.armarContenido();
+	}
+	
+	public PolizaAlta1(JFrame ventana, JPanel panelMenu,UsuarioDTO usuarioDTO,ClienteDTO clienteDTO) {
+		this.ventana = ventana;
+		this.panelMenu = panelMenu;
+		this.usuarioDTO = usuarioDTO;
+		this.clienteDTO = clienteDTO;
 		this.gbcContenido = new GridBagConstraints();
 		this.gbcCliente = new GridBagConstraints();
 		this.gbcDomicilio = new GridBagConstraints();
@@ -235,6 +262,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcCliente.anchor = GridBagConstraints.CENTER;
 		gbcCliente.fill = GridBagConstraints.HORIZONTAL;
 		panelDatosCliente.add(txtNumCliente, gbcCliente);
+		if(clienteDTO != null)txtNumCliente.setText(clienteDTO.getNroCliente());
 		
 		lblTipoDocumento = new JLabel("Tipo Documento");
 		gbcCliente.gridx = 2;
@@ -252,6 +280,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcCliente.anchor = GridBagConstraints.CENTER;
 		gbcCliente.fill = GridBagConstraints.HORIZONTAL;
 		panelDatosCliente.add(txtTipoDocumento, gbcCliente);
+		if(clienteDTO != null)	txtTipoDocumento.setText(clienteDTO.getTipoDocumento());
 		
 		lblNumDocumento = new JLabel("Número Documento");
 		gbcCliente.gridx = 4;
@@ -269,6 +298,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcCliente.anchor = GridBagConstraints.CENTER;
 		gbcCliente.fill = GridBagConstraints.HORIZONTAL;
 		panelDatosCliente.add(txtNumDocumento, gbcCliente);
+		if(clienteDTO != null) txtNumDocumento.setText(clienteDTO.getDocumento());
 		
 		lblApellido = new JLabel("Apellido");
 		gbcCliente.gridx = 0;
@@ -286,6 +316,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcCliente.anchor = GridBagConstraints.CENTER;
 		gbcCliente.fill = GridBagConstraints.HORIZONTAL;
 		panelDatosCliente.add(txtApellido, gbcCliente);
+		if(clienteDTO != null) txtApellido.setText(clienteDTO.getApellido());
 		
 		lblNombre = new JLabel("Nombre");
 		gbcCliente.gridx = 2;
@@ -303,6 +334,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcCliente.anchor = GridBagConstraints.CENTER;
 		gbcCliente.fill = GridBagConstraints.HORIZONTAL;
 		panelDatosCliente.add(txtNombre, gbcCliente);
+		if(clienteDTO != null) txtNombre.setText(clienteDTO.getNombre());
 		
 		panelDomicilio = new JPanel();
 		panelDomicilio.setLayout(new GridBagLayout());
@@ -328,6 +360,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtPais, gbcDomicilio);
+		if(clienteDTO != null) txtPais.setText(clienteDTO.getPais());
 		
 		lblProvincia = new JLabel("Provincia");
 		gbcDomicilio.gridx = 2;
@@ -345,6 +378,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtProvincia, gbcDomicilio);
+		if(clienteDTO != null) txtProvincia.setText(clienteDTO.getProvincia());
 		
 		lblLocalidad = new JLabel("Localidad");
 		gbcDomicilio.gridx = 4;
@@ -362,6 +396,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtLocalidad, gbcDomicilio);
+		if(clienteDTO != null) txtLocalidad.setText(clienteDTO.getLocalidad());
 		
 		lblCodigoPostal = new JLabel("Código Postal");
 		gbcDomicilio.gridx = 6;
@@ -379,6 +414,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtCodigoPostal, gbcDomicilio);
+		if(clienteDTO != null) txtCodigoPostal.setText(clienteDTO.getCodigoPostal());
 		
 		lblCalle = new JLabel("Calle");
 		gbcDomicilio.gridx = 0;
@@ -396,6 +432,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtCalle, gbcDomicilio);
+		if(clienteDTO != null) txtCalle.setText(clienteDTO.getCalle());
 		
 		lblNumero = new JLabel("Número");
 		gbcDomicilio.gridx = 2;
@@ -413,6 +450,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtNumero, gbcDomicilio);
+		if(clienteDTO != null) txtNumero.setText(clienteDTO.getNumero());
 		
 		lblDpto = new JLabel("Dpto");
 		gbcDomicilio.gridx = 4;
@@ -430,6 +468,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtDpto, gbcDomicilio);
+		if(clienteDTO != null) txtDpto.setText(clienteDTO.getDpto());
 		
 		lblPiso = new JLabel("Piso");
 		gbcDomicilio.gridx = 6;
@@ -447,6 +486,7 @@ public class PolizaAlta1 extends JPanel {
 		gbcDomicilio.anchor = GridBagConstraints.CENTER;
 		gbcDomicilio.fill = GridBagConstraints.HORIZONTAL;
 		panelDomicilio.add(txtPiso, gbcDomicilio);
+		if(clienteDTO != null) txtPiso.setText(clienteDTO.getPiso());
 		
 		btnBuscarCliente = new JButton("Buscar Cliente");
 		gbcCliente.gridx = 5;
@@ -457,28 +497,9 @@ public class PolizaAlta1 extends JPanel {
 		gbcCliente.fill = GridBagConstraints.NONE;
 		panelDatosCliente.add(btnBuscarCliente, gbcCliente);
 		btnBuscarCliente.addActionListener(e -> {
-			//TODO: ETAPA 8: Buscar Cliente
 			ventana.setTitle("Cliente - Consulta");
-			ventana.setContentPane(new ClienteConsulta(ventana, this));
+			ventana.setContentPane(new ClienteConsulta(ventana, this,usuarioDTO));
 			ventana.setVisible(true);
-			/*clienteDTO = gestorCliente.findCliente(1);
-			if(clienteDTO != null) {
-				txtNumCliente.setText(clienteDTO.getNroCliente());
-				txtTipoDocumento.setText(clienteDTO.getTipoDocumento());
-				txtNumDocumento.setText(clienteDTO.getDocumento());
-				txtApellido.setText(clienteDTO.getApellido());
-				txtNombre.setText(clienteDTO.getNombre());
-				txtPais.setText(clienteDTO.getPais());
-				txtProvincia.setText(clienteDTO.getProvincia());
-				txtLocalidad.setText(clienteDTO.getLocalidad());
-				txtCodigoPostal.setText(clienteDTO.getCodigoPostal());
-				txtCalle.setText(clienteDTO.getCalle());
-				txtNumero.setText(clienteDTO.getNumero());
-				txtDpto.setText(clienteDTO.getDpto());
-				txtPiso.setText(clienteDTO.getPiso());
-				String cantSiniestros = gestorSubsistemaSiniestro.getCantSiniestrosByNroCliente(clienteDTO.getNroCliente());
-				txtNumSiniestros.setText(cantSiniestros);
-			}*/
 		});
 		
 		panelDomicilioRiesgo = new JPanel();
@@ -889,6 +910,10 @@ public class PolizaAlta1 extends JPanel {
 		gbcPoliza.gridy = 3;
 		gbcPoliza.insets = new Insets(10, 10, 10, 10);
 		panelDatosPoliza.add(txtNumSiniestros, gbcPoliza);
+		if(clienteDTO != null) {
+			String cantSiniestros = gestorSubsistemaSiniestro.getCantSiniestrosByNroCliente(clienteDTO.getNroCliente());
+			txtNumSiniestros.setText(cantSiniestros);
+		}
 		
 		panelDeclaracionHijos = new JPanel();
 		panelDeclaracionHijos.setLayout(new GridBagLayout());
