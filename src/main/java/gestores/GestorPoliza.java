@@ -104,7 +104,10 @@ public final class GestorPoliza {
 		
 		Cliente cliente = clienteDao.findClienteByIdConPolizas(datos.getDatosPoliza().getIdCliente());
 		if(cliente == null) {
-			//Significa que no tiene polizas asociadas
+			/**
+			 * Significa que no tiene polizas asociadas
+			 * Hay que saber la cantidad de polizas que tiene un cliente para actualizar su estado
+			 */
 			cliente = clienteDao.findClienteById(datos.getDatosPoliza().getIdCliente());
 			cliente.setPoliza(new ArrayList<Poliza>());
 		}

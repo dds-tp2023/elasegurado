@@ -168,7 +168,7 @@ public class PolizaAlta1 extends JPanel {
 	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
 	private GestorGeografico gestorGeografico = GestorGeografico.getInstancia();
 	
-	private ClienteDTO clienteDTO;
+	private ClienteDTO clienteDTO = null;
 	private ProvinciaDTO provinciaDefecto = new ProvinciaDTO("SELECCIONAR");
 	private LocalidadDTO localidadDefecto = new LocalidadDTO("SELECCIONAR");
 	private MarcaVehiculoDTO marcaDefecto = new MarcaVehiculoDTO("SELECCIONAR");
@@ -458,10 +458,10 @@ public class PolizaAlta1 extends JPanel {
 		panelDatosCliente.add(btnBuscarCliente, gbcCliente);
 		btnBuscarCliente.addActionListener(e -> {
 			//TODO: ETAPA 8: Buscar Cliente
-			/*ventana.setTitle("Cliente - Consulta");
+			ventana.setTitle("Cliente - Consulta");
 			ventana.setContentPane(new ClienteConsulta(ventana, this));
-			ventana.setVisible(true);*/
-			clienteDTO = gestorCliente.findCliente(1);
+			ventana.setVisible(true);
+			/*clienteDTO = gestorCliente.findCliente(1);
 			if(clienteDTO != null) {
 				txtNumCliente.setText(clienteDTO.getNroCliente());
 				txtTipoDocumento.setText(clienteDTO.getTipoDocumento());
@@ -478,7 +478,7 @@ public class PolizaAlta1 extends JPanel {
 				txtPiso.setText(clienteDTO.getPiso());
 				String cantSiniestros = gestorSubsistemaSiniestro.getCantSiniestrosByNroCliente(clienteDTO.getNroCliente());
 				txtNumSiniestros.setText(cantSiniestros);
-			}
+			}*/
 		});
 		
 		panelDomicilioRiesgo = new JPanel();
@@ -1075,74 +1075,78 @@ public class PolizaAlta1 extends JPanel {
         	cbMarcaVehiculo.setBorder(defaultBorderCB);
         	cbModeloVehiculo.setBorder(defaultBorderCB);
         	cbAnioVehiculo.setBorder(defaultBorderCB);
-        	if(noEstanTodosDatosObligatorios()) {
-        		mensajeDatosObligatorios();
-        		Border redBorder = BorderFactory.createLineBorder(Color.RED);
-        		if(txtMotor.getText().isBlank()) txtMotor.setBorder(redBorder);
-        		if(txtChasis.getText().isBlank()) txtChasis.setBorder(redBorder);
-        		if(txtKmPorAnio.getText().isBlank()) txtKmPorAnio.setBorder(redBorder);
-        		if(cbProvinciaRiesgo.getSelectedItem().toString().equals("SELECCIONAR")) cbProvinciaRiesgo.setBorder(redBorder);
-        		if(cbLocalidadRiesgo.getSelectedItem().toString().equals("SELECCIONAR")) cbLocalidadRiesgo.setBorder(redBorder);
-        		if(cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbMarcaVehiculo.setBorder(redBorder);
-        		if(cbModeloVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbModeloVehiculo.setBorder(redBorder);
-        		if(cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbAnioVehiculo.setBorder(redBorder);
-        	}
-        	else {
-        		DatosPolizaDTO datosPolizaDTO = new DatosPolizaDTO();
-        		datosPolizaDTO.setIdCliente(clienteDTO.getId());
-        		LocalidadDTO localidad = (LocalidadDTO) cbLocalidadRiesgo.getSelectedItem();
-        		datosPolizaDTO.setIdLocalidad(localidad.getId());
-        		ModeloVehiculoDTO modelo = (ModeloVehiculoDTO) cbModeloVehiculo.getSelectedItem();
-        		datosPolizaDTO.setIdModelo(modelo.getId());
-        		AnioFabricacionDTO anioFabricacion = (AnioFabricacionDTO) cbAnioVehiculo.getSelectedItem();
-        		datosPolizaDTO.setIdAnioFabricacion(anioFabricacion.getId());
-        		datosPolizaDTO.setMotor(txtMotor.getText());
-        		datosPolizaDTO.setChasis(txtChasis.getText());
-        		datosPolizaDTO.setPatente(txtPatente.getText());
-        		datosPolizaDTO.setKmPorAnio(txtKmPorAnio.getText());
-        		datosPolizaDTO.setCantSiniestros(txtNumSiniestros.getText());
-        		datosPolizaDTO.setSumaAsegurada(txtSumaAsegurada.getText());
-        		List<HijoDeclaradoDTO> hijosDeclarados = new ArrayList<HijoDeclaradoDTO>();
-        		for (int i = 0; i < modeloTablaHijos.getRowCount(); i++) {
-        			DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        			LocalDate fechaNacimiento = null;
-        			String sexo = null;
-        			String estadoCivil = null;
-        			HijoDeclaradoDTO hijoDeclarado = new HijoDeclaradoDTO();
-                    for (int j = 0; j < modeloTablaHijos.getColumnCount(); j++) {
-                        if(j==0) {
-                        	fechaNacimiento = LocalDate.parse(modeloTablaHijos.getValueAt(i, j).toString(),formato); 
-                        }if(j==1) {
-                        	sexo = modeloTablaHijos.getValueAt(i, j).toString();
-                        }else {
-                        	estadoCivil = modeloTablaHijos.getValueAt(i, j).toString();
+        	if(clienteDTO == null) {
+        		mensajeBuscarCliente();
+        	}else {
+        		if(noEstanTodosDatosObligatorios()) {
+            		mensajeDatosObligatorios();
+            		Border redBorder = BorderFactory.createLineBorder(Color.RED);
+            		if(txtMotor.getText().isBlank()) txtMotor.setBorder(redBorder);
+            		if(txtChasis.getText().isBlank()) txtChasis.setBorder(redBorder);
+            		if(txtKmPorAnio.getText().isBlank()) txtKmPorAnio.setBorder(redBorder);
+            		if(cbProvinciaRiesgo.getSelectedItem().toString().equals("SELECCIONAR")) cbProvinciaRiesgo.setBorder(redBorder);
+            		if(cbLocalidadRiesgo.getSelectedItem().toString().equals("SELECCIONAR")) cbLocalidadRiesgo.setBorder(redBorder);
+            		if(cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbMarcaVehiculo.setBorder(redBorder);
+            		if(cbModeloVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbModeloVehiculo.setBorder(redBorder);
+            		if(cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR")) cbAnioVehiculo.setBorder(redBorder);
+            	}
+            	else {
+            		DatosPolizaDTO datosPolizaDTO = new DatosPolizaDTO();
+            		datosPolizaDTO.setIdCliente(clienteDTO.getId());
+            		LocalidadDTO localidad = (LocalidadDTO) cbLocalidadRiesgo.getSelectedItem();
+            		datosPolizaDTO.setIdLocalidad(localidad.getId());
+            		ModeloVehiculoDTO modelo = (ModeloVehiculoDTO) cbModeloVehiculo.getSelectedItem();
+            		datosPolizaDTO.setIdModelo(modelo.getId());
+            		AnioFabricacionDTO anioFabricacion = (AnioFabricacionDTO) cbAnioVehiculo.getSelectedItem();
+            		datosPolizaDTO.setIdAnioFabricacion(anioFabricacion.getId());
+            		datosPolizaDTO.setMotor(txtMotor.getText());
+            		datosPolizaDTO.setChasis(txtChasis.getText());
+            		datosPolizaDTO.setPatente(txtPatente.getText());
+            		datosPolizaDTO.setKmPorAnio(txtKmPorAnio.getText());
+            		datosPolizaDTO.setCantSiniestros(txtNumSiniestros.getText());
+            		datosPolizaDTO.setSumaAsegurada(txtSumaAsegurada.getText());
+            		List<HijoDeclaradoDTO> hijosDeclarados = new ArrayList<HijoDeclaradoDTO>();
+            		for (int i = 0; i < modeloTablaHijos.getRowCount(); i++) {
+            			DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            			LocalDate fechaNacimiento = null;
+            			String sexo = null;
+            			String estadoCivil = null;
+            			HijoDeclaradoDTO hijoDeclarado = new HijoDeclaradoDTO();
+                        for (int j = 0; j < modeloTablaHijos.getColumnCount(); j++) {
+                            if(j==0) {
+                            	fechaNacimiento = LocalDate.parse(modeloTablaHijos.getValueAt(i, j).toString(),formato); 
+                            }if(j==1) {
+                            	sexo = modeloTablaHijos.getValueAt(i, j).toString();
+                            }else {
+                            	estadoCivil = modeloTablaHijos.getValueAt(i, j).toString();
+                            }
                         }
+                        hijoDeclarado.setFechaNacimiento(fechaNacimiento);
+                        hijoDeclarado.setSexo(sexo);
+                        hijoDeclarado.setEstadoCivil(estadoCivil);
+                        hijosDeclarados.add(hijoDeclarado);
                     }
-                    hijoDeclarado.setFechaNacimiento(fechaNacimiento);
-                    hijoDeclarado.setSexo(sexo);
-                    hijoDeclarado.setEstadoCivil(estadoCivil);
-                    hijosDeclarados.add(hijoDeclarado);
-                }
-        		datosPolizaDTO.setHijosDeclarados(hijosDeclarados);
-        		List<String> medidasSeguridad = new ArrayList<String>();
-        		if(chbAlarma.isSelected()) medidasSeguridad.add("tiene_alarma");
-        		if(chbGarage.isSelected()) medidasSeguridad.add("se_guarda_en_garage");
-        		if(chbRastreo.isSelected()) medidasSeguridad.add("posee_dispositivos_de_rastreo");
-        		if(chbTuercasAntirrobo.isSelected()) medidasSeguridad.add("posee_tuercas_antirrobo");
-        		datosPolizaDTO.setMedidasSeguridad(medidasSeguridad);
-        		boolean datosConfirmados = false;
-        		try {
-					datosConfirmados = gestorPoliza.confirmarDatosPoliza(datosPolizaDTO);
-				} catch (DatosNoValidosException e1) {
-					mensajeDatosNoValidos(e1.getMessage());
-				} catch (ExistePolizaVigenteException e1) {
-					mensajeExistePolizaVigente(e1.getMessage());
-				}
-        		if(datosConfirmados) {
-        			ventana.setTitle("Póliza - Alta - 2");
-                	ventana.setContentPane(new PolizaAlta2(ventana,panelMenu, this, datosPolizaDTO));
-                	ventana.setVisible(true);
-        		}
+            		datosPolizaDTO.setHijosDeclarados(hijosDeclarados);
+            		List<String> medidasSeguridad = new ArrayList<String>();
+            		if(chbAlarma.isSelected()) medidasSeguridad.add("tiene_alarma");
+            		if(chbGarage.isSelected()) medidasSeguridad.add("se_guarda_en_garage");
+            		if(chbRastreo.isSelected()) medidasSeguridad.add("posee_dispositivos_de_rastreo");
+            		if(chbTuercasAntirrobo.isSelected()) medidasSeguridad.add("posee_tuercas_antirrobo");
+            		datosPolizaDTO.setMedidasSeguridad(medidasSeguridad);
+            		boolean datosConfirmados = false;
+            		try {
+    					datosConfirmados = gestorPoliza.confirmarDatosPoliza(datosPolizaDTO);
+    				} catch (DatosNoValidosException e1) {
+    					mensajeDatosNoValidos(e1.getMessage());
+    				} catch (ExistePolizaVigenteException e1) {
+    					mensajeExistePolizaVigente(e1.getMessage());
+    				}
+            		if(datosConfirmados) {
+            			ventana.setTitle("Póliza - Alta - 2");
+                    	ventana.setContentPane(new PolizaAlta2(ventana,panelMenu, this, datosPolizaDTO));
+                    	ventana.setVisible(true);
+            		}
+            	}
         	}
         });
         
@@ -1171,6 +1175,11 @@ public class PolizaAlta1 extends JPanel {
 				cbMarcaVehiculo.getSelectedItem().toString().equals("SELECCIONAR") ||
 				cbModeloVehiculo.getSelectedItem().toString().equals("SELECCIONAR") ||
 				cbAnioVehiculo.getSelectedItem().toString().equals("SELECCIONAR"));
+	}
+	
+	private void mensajeBuscarCliente() {
+		String mensaje = "Debe buscar un cliente para asociar a la póliza";
+		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	private void mensajeDatosNoValidos(String mensajeException) {
