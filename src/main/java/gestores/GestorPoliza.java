@@ -53,6 +53,7 @@ public final class GestorPoliza {
 	private GeograficoDao geograficoDao;
 	private MedidaSeguridadDao medidaSeguridadDao;
 	private TipoCoberturaDao tipoCoberturaDao;
+	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
 	
 	private GestorPoliza() {}
 	
@@ -176,7 +177,21 @@ public final class GestorPoliza {
 
 	private void actualizarCondicionCliente(Cliente cliente) {
 		//TODO: Consultar condicion cliente
-		cliente.setCondicionCliente(CondicionCliente.NORMAL);
+		factory = FactoryDao.getFactory(FactoryDao.PG_FACTORY);
+		polizaDao = factory.getPolizaDao();
+		CantidadSiniestros cantSiniestros = CantidadSiniestros.valueOf(gestorSubsistemaSiniestro.getCantSiniestrosByNroCliente(cliente.getNroCliente()));
+		
+		if(cliente.getPoliza().size() == 1) {
+			cliente.setCondicionCliente(CondicionCliente.NORMAL);
+		}else if(polizaDao.findPolizasVigentesByIdCliente(cliente.getId()).size() == 0) {
+			cliente.setCondicionCliente(CondicionCliente.NORMAL);
+		}else if(cantSiniestros != CantidadSiniestros.NINGUNO) {
+			//TODO: agregar cuotas impagas y antiguedad de 2 años
+			cliente.setCondicionCliente(CondicionCliente.NORMAL);
+		}else {
+			cliente.setCondicionCliente(CondicionCliente.PLATA);
+		}
+		
 	}
 	
 	private String generarNroPoliza(Poliza poliza) {
