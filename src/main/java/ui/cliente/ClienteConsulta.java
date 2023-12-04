@@ -4,6 +4,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +60,21 @@ public class ClienteConsulta extends JPanel {
 	private JTable tablaResultadoBusqueda;
 	private DefaultTableModel modeloTablaResultadoBusqueda;
 	private JScrollPane scrollTablaResultadoBusqueda;
+	private JButton btnPaginaAnterior;
+	private JButton btnPaginaSiguiente;
 	private JButton btnSeleccionar;
 	private JButton btnCancelar;
 
 	private GestorCliente gestorCliente = GestorCliente.getInstancia();
 
 	private UsuarioDTO usuarioDTO;
+	
+	private List<ClienteDTO> clientesDTO;
 
+	private int paginaActual = 0;
+	
+	private Integer cantidadRegistros;
+	
 	public ClienteConsulta(JFrame ventana, JPanel panelPolizaAlta,UsuarioDTO usuarioDTO) {
 		this.ventana = ventana;
 		this.panelPolizaAlta = panelPolizaAlta;
@@ -219,7 +232,7 @@ public class ClienteConsulta extends JPanel {
 				criterios.setNombre(txtNombre.getText());
 				criterios.setTipoDocumento(cbTipoDocumento.getSelectedItem().toString());
 				criterios.setDocumento(txtNumDocumento.getText());
-				List<ClienteDTO> clientesDTO = gestorCliente.buscarClienteSegunCriterio(criterios);
+				clientesDTO = gestorCliente.buscarClienteSegunCriterio(criterios);
 				if(clientesDTO.size()==0) {
 					String mensaje = "No existen clientes que cumplen con los criterios ingresados";
 					int confirmado = JOptionPane.showOptionDialog(this, mensaje, "INFORMACIÓN", JOptionPane.YES_NO_OPTION,
@@ -230,10 +243,24 @@ public class ClienteConsulta extends JPanel {
 						ventana.setVisible(true);
 					}
 				}else {
+					try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/configuracion.txt"))) {
+			       
+						br.readLine();
+						String filaDeseada = br.readLine();
+						cantidadRegistros = Integer.parseInt(filaDeseada);
+			            
+			        } catch (IOException e1) {
+			            
+			        }
 					modeloTablaResultadoBusqueda.setRowCount(0);
-					for(ClienteDTO c : clientesDTO) {
+					/*for(ClienteDTO c : clientesDTO) {
+						modeloTablaResultadoBusqueda.addRow(new Object[] { c.getId(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
+					}*/
+					for(int i = 0; i<cantidadRegistros; i++) {
+						ClienteDTO c = clientesDTO.get(i);
 						modeloTablaResultadoBusqueda.addRow(new Object[] { c.getId(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
 					}
+					
 				}
 			
 			}
@@ -281,10 +308,40 @@ public class ClienteConsulta extends JPanel {
         scrollTablaResultadoBusqueda = new JScrollPane(tablaResultadoBusqueda);
         gbcResultadoBusqueda.gridx = 0;
         gbcResultadoBusqueda.gridy = 0;
+        gbcResultadoBusqueda.gridwidth = 2;
         gbcResultadoBusqueda.weightx = 1;
         gbcResultadoBusqueda.fill = GridBagConstraints.HORIZONTAL;
         gbcResultadoBusqueda.insets = new Insets(10, 10, 10, 10);
         panelResultadoBusqueda.add(scrollTablaResultadoBusqueda, gbcResultadoBusqueda);
+        
+     // Crear botones de paginación
+        btnPaginaAnterior = new JButton("Anterior");
+        gbcResultadoBusqueda.gridx = 0;
+        gbcResultadoBusqueda.gridy = 1;
+        gbcResultadoBusqueda.gridwidth = 1;
+        gbcResultadoBusqueda.weightx = 0.5;
+		gbcResultadoBusqueda.anchor = GridBagConstraints.EAST;
+		gbcResultadoBusqueda.fill = GridBagConstraints.NONE;
+		panelResultadoBusqueda.add(btnPaginaAnterior, gbcResultadoBusqueda);
+        btnPaginaAnterior.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                paginaAnterior();
+            }
+        });
+
+        btnPaginaSiguiente = new JButton("Siguiente");
+        gbcResultadoBusqueda.gridx = 1;
+        gbcResultadoBusqueda.gridy = 1;
+		gbcResultadoBusqueda.anchor = GridBagConstraints.WEST;
+		panelResultadoBusqueda.add(btnPaginaSiguiente, gbcResultadoBusqueda);
+        btnPaginaSiguiente.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                paginaSiguiente();
+            }
+
+        });
         
         btnSeleccionar = new JButton("Seleccionar");
         gbc.gridx = 0;
@@ -340,6 +397,37 @@ public class ClienteConsulta extends JPanel {
 	private void mensajeSeleccionarCliente() {
 		String mensaje = "Debe seleccionar un cliente";
 		JOptionPane.showMessageDialog(this, mensaje, "ERROR", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	private void paginaAnterior() {
+		if (paginaActual > 0) {
+            paginaActual--;
+            updateTable();
+        }
+		
+	}
+	
+	// Método para actualizar la tabla con los datos de la página actual
+    private void updateTable() {
+        int startRow = paginaActual * cantidadRegistros;
+        int endRow = Math.min((paginaActual + 1) * cantidadRegistros, clientesDTO.size());
+
+        modeloTablaResultadoBusqueda.setRowCount(0);
+		for(int i = startRow; i<endRow; i++) {
+			ClienteDTO c = clientesDTO.get(i);
+			modeloTablaResultadoBusqueda.addRow(new Object[] { c.getId(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
+		}
+    }
+
+
+	private void paginaSiguiente() {
+		int totalRows = clientesDTO.size();
+        int startRow = (paginaActual + 1) * cantidadRegistros;
+
+        if (startRow < totalRows) {
+            paginaActual++;
+            updateTable();
+        }
 	}
 
 }

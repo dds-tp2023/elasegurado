@@ -741,7 +741,7 @@ public class PolizaAlta1 extends JPanel {
 			}
 		});
 		
-		lblSumaAsegurada = new JLabel("SumaAsegurada");
+		lblSumaAsegurada = new JLabel("Suma Asegurada");
 		gbcDatosVehiculo.gridx = 0;
 		gbcDatosVehiculo.gridy = 1;
 		gbcDatosVehiculo.weightx = 0;
