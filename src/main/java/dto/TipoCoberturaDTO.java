@@ -1,7 +1,5 @@
 package dto;
 
-import enums.EnumTipoCobertura;
-
 public class TipoCoberturaDTO {
 	private Integer id;
 	private String nombre;

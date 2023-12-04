@@ -50,7 +50,6 @@ import enums.EstadoCivil;
 import enums.Sexo;
 import excepciones.DatosNoValidosException;
 import excepciones.ExistePolizaVigenteException;
-import gestores.GestorCliente;
 import gestores.GestorGeografico;
 import gestores.GestorParametroVehiculo;
 import gestores.GestorPoliza;
@@ -164,7 +163,7 @@ public class PolizaAlta1 extends JPanel {
 	private Border defaultBorderDC = (new JDateChooser().getBorder()); //Border por defecto date chooser
 	
 	private GestorPoliza gestorPoliza = GestorPoliza.getInstancia();
-	private GestorCliente gestorCliente = GestorCliente.getInstancia();
+	//private GestorCliente gestorCliente = GestorCliente.getInstancia();
 	private GestorParametroVehiculo gestorParametroVehiculo = GestorParametroVehiculo.getInstancia();
 	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
 	private GestorGeografico gestorGeografico = GestorGeografico.getInstancia();

@@ -8,10 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import dao.interfaces.TipoCoberturaDao;
-import dominio.AjusteModelo;
 import dominio.AjusteTipoCobertura;
-import dominio.Modelo;
-import dominio.Provincia;
 import dominio.TipoCobertura;
 import utils.HibernateUtil;
 

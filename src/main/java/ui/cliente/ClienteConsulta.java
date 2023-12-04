@@ -1,11 +1,9 @@
 package ui.cliente;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +18,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 
 import dto.BusquedaClienteDTO;
 import dto.ClienteDTO;
 import dto.UsuarioDTO;
-import enums.Sexo;
 import enums.TipoDocumento;
 import gestores.GestorCliente;
 import ui.menus.MenuProductorSeguro;
@@ -64,7 +60,6 @@ public class ClienteConsulta extends JPanel {
 
 	private GestorCliente gestorCliente = GestorCliente.getInstancia();
 
-	private ClienteDTO clienteDTO;
 	private UsuarioDTO usuarioDTO;
 
 	public ClienteConsulta(JFrame ventana, JPanel panelPolizaAlta,UsuarioDTO usuarioDTO) {
@@ -168,7 +163,6 @@ public class ClienteConsulta extends JPanel {
 		gbcBusquedaCliente.anchor = GridBagConstraints.CENTER;
 		gbcBusquedaCliente.fill = GridBagConstraints.HORIZONTAL;
 		panelBusquedaCliente.add(cbTipoDocumento, gbcBusquedaCliente);
-		
 		cbTipoDocumento.addItem("SELECCIONAR");
 		List<String> tiposDocumentos = new ArrayList<String>();
 		for(TipoDocumento tipoDoc : TipoDocumento.values()) {
@@ -257,8 +251,7 @@ public class ClienteConsulta extends JPanel {
 			txtApellido.setText("");
 			txtNombre.setText("");
 			txtNumDocumento.setText("");
-			cbTipoDocumento.setSelectedIndex(0);
-			//TODO: Falta que el combo box muestre valor por defecto "DNI" /ahi lo puse en la linea de arriba
+			cbTipoDocumento.setSelectedItem("DNI");
 		});
 		
 		modeloTablaResultadoBusqueda = new DefaultTableModel() {

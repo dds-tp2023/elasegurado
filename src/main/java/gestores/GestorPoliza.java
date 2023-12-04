@@ -33,7 +33,6 @@ import dto.GeneracionPolizaDTO;
 import dto.HijoDeclaradoDTO;
 import dto.PrimaDTO;
 import dto.PrimaYdescuentosDTO;
-import dto.TipoCoberturaDTO;
 import enums.CantidadSiniestros;
 import enums.CondicionCliente;
 import enums.EstadoCivil;

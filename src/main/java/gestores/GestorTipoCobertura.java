@@ -5,18 +5,10 @@ import java.util.List;
 
 import dao.factory.FactoryDao;
 import dao.interfaces.TipoCoberturaDao;
-import dominio.AjusteModelo;
 import dominio.AjusteTipoCobertura;
-import dominio.Marca;
-import dominio.Modelo;
 import dominio.TipoCobertura;
-import dto.AjusteModeloDTO;
 import dto.AjusteTipoCoberturaDTO;
-import dto.AnioFabricacionDTO;
-import dto.MarcaVehiculoDTO;
-import dto.ModeloVehiculoDTO;
 import dto.TipoCoberturaDTO;
-import enums.EnumTipoCobertura;
 
 public final class GestorTipoCobertura {
 	private static GestorTipoCobertura instancia;

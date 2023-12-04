@@ -32,15 +32,12 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
-import dominio.Cliente;
 import dto.AnioFabricacionDTO;
 import dto.ClienteDTO;
 import dto.CuotaDTO;
 import dto.DatosPolizaDTO;
-import dto.DescuentosDTO;
 import dto.GeneracionPolizaDTO;
 import dto.ModeloDTO;
-import dto.PrimaDTO;
 import dto.PrimaYdescuentosDTO;
 import dto.TipoCoberturaDTO;
 import enums.EnumTipoCobertura;
