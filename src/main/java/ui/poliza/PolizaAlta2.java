@@ -331,8 +331,8 @@ public class PolizaAlta2 extends JPanel {
 							datosPoliza.getIdLocalidad(), datosPoliza.getIdModelo(),
 							Integer.parseInt(datosPoliza.getKmPorAnio()), datosPoliza.getMedidasSeguridad(),datosPoliza.getCantSiniestros(),
 							datosPoliza.getHijosDeclarados().size());
-					Double descuentosTotales = primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral() + primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales();
-					txtDescuento.setText(descuentosTotales.toString());
+					double descuentosTotales = Math.round(primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral() + primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales());
+					txtDescuento.setText(""+descuentosTotales);
 					txtDerechosEmision.setText(primaYdescuentosDTO.getPrima().getValorDerechosEmision().toString());
 					txtPremioCalculo.setText(primaYdescuentosDTO.getPrima().getValorPremio().toString());
 					ClienteDTO clienteDTO = new ClienteDTO();
@@ -357,18 +357,19 @@ public class PolizaAlta2 extends JPanel {
 	        		txtPremio.setText(primaYdescuentosDTO.getPrima().getValorPremio().toString());
 	        		
 	        		modeloTablaDescuentos.setRowCount(0);
-	        		Double descuentoMasDeUnaUnidad = primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales();
-	        		Double descuentoPagoSemestral = primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral();
+	        		double descuentoMasDeUnaUnidad = Math.round(primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales());
+	        		double descuentoPagoSemestral = Math.round(primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral());
 	        		modeloTablaDescuentos.addRow(new Object[] {"Descuento por más de una unidad",descuentoMasDeUnaUnidad});
 	        		modeloTablaDescuentos.addRow(new Object[] {"Descuento por pago semestral",descuentoPagoSemestral});
 	        		
-	        		Double montoTotal = primaYdescuentosDTO.getPrima().getValorDerechosEmision() + 
+	        		double montoTotal = Math.round(primaYdescuentosDTO.getPrima().getValorDerechosEmision() + 
 	        				primaYdescuentosDTO.getPrima().getValorPremio() - primaYdescuentosDTO.getDescuentos().getDescuentoPagoSemestral() -
-	        				primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales();
+	        				primaYdescuentosDTO.getDescuentos().getDescuentosUnidadesAdicionales()) ;
 	        		
 	        		modeloTablaDiaPago.setRowCount(0);
 	        		if(cbFormaPago.getSelectedItem().toString().equals("SEMESTRAL")) {
 	        			CuotaDTO cuota = new CuotaDTO();
+	        			cuota.setNroCuota(1);
 	        			cuota.setMonto(montoTotal);
 	        			Instant ultimoDiaPago =  dcFechaInicio.getDate().toInstant().minus(1, ChronoUnit.DAYS);
 	        			cuota.setUltimoDiaPago(ultimoDiaPago.atZone(ZoneId.systemDefault()).toLocalDate());
@@ -382,6 +383,7 @@ public class PolizaAlta2 extends JPanel {
 	        			ZonedDateTime ultimoDiaPago =  dcFechaInicio.getDate().toInstant().atZone(ZoneId.systemDefault()).minusDays(1);
 	        			for(int i=1; i<=6;i++) {
 	        				CuotaDTO cuota = new CuotaDTO();
+	        				cuota.setNroCuota(i);
 		        			cuota.setMonto(montoCuota);
 		        			if(i==1) cuota.setUltimoDiaPago(ultimoDiaPago.toLocalDate());
 		        			else {
@@ -394,7 +396,7 @@ public class PolizaAlta2 extends JPanel {
 		        			modeloTablaDiaPago.addRow(new Object[] {i,fechaConFormato,montoCuota});
 	        			}
 	        		}
-	        		txtMontoAbonar.setText(montoTotal.toString());
+	        		txtMontoAbonar.setText(""+montoTotal);
 				}
 			}
 		});
