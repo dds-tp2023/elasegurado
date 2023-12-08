@@ -70,6 +70,8 @@ INSERT INTO cliente(
 -- INSERT DE USUARIO
 INSERT INTO usuario(rol, nombre_usuario, contrasenia)
 	VALUES ('PRODUCTOR_SEGURO', 'productor01', 'admin');   
+INSERT INTO usuario(rol,nombre_usuario,contrasenia)
+	VALUES ('COBRADOR','cobrador01','admin');
 
 -- INSERT DE MARCA
 INSERT INTO marca (nombre_marca) VALUES ('Ford');
@@ -599,7 +601,83 @@ INSERT INTO parametro_poliza (fecha_inicio_vigencia, fecha_fin_vigencia, porcent
 							 porcentaje_sin_siniestro, porcentaje_un_siniestro, porcentaje_dos_siniestro,
 							 porcentaje_mas_de_dos_siniestro, porcentaje_por_hijo_registrado, 
 							 descuento_por_unidad_adicional, descuento_por_pago_semestral,valor_derecho_de_emision, id_registro_auditoria)
-							 VALUES ('2023-11-15', '2024-11-15', 0.00840566,
+							 VALUES ('2020-11-15', '2024-11-15', 0.00840566,
 									0, 0.00925994, 0.01530689,
 									0.01157732, 0.00329591,
 									0.05678593,0.25, 364, 32);
+
+-- INSERT DE POLIZA
+INSERT INTO poliza (motor,cantidad_siniestros,fecha_inicio_vigencia,fecha_fin_vigencia,patente,estado,
+					km_por_anio,nro_poliza,forma_pago,chasis,valor_descuento,valor_premio,id_modelo,id_localidad,
+					id_parametro_poliza,id_cliente,id_tipo_cobertura,id_anio_fabricacion)
+					VALUES ('aaaaa','NINGUNO','2021-01-01','2021-06-30','AD278FX','NO_VIGENTE',
+							70000,'3528000000000','SEMESTRAL','aaaaa',15091,60000,1,1,1,1,1,1);
+
+INSERT INTO poliza (motor,cantidad_siniestros,fecha_inicio_vigencia,fecha_fin_vigencia,patente,estado,
+					km_por_anio,nro_poliza,forma_pago,chasis,valor_descuento,valor_premio,id_modelo,id_localidad,
+					id_parametro_poliza,id_cliente,id_tipo_cobertura,id_anio_fabricacion)
+					VALUES ('aaaaa','NINGUNO','2021-07-01','2021-12-31','AD278FX','NO_VIGENTE',
+							80000,'3528000000001','SEMESTRAL','aaaaa',15091,60000,1,1,1,1,1,1);
+
+INSERT INTO poliza (motor,cantidad_siniestros,fecha_inicio_vigencia,fecha_fin_vigencia,patente,estado,
+					km_por_anio,nro_poliza,forma_pago,chasis,valor_descuento,valor_premio,id_modelo,id_localidad,
+					id_parametro_poliza,id_cliente,id_tipo_cobertura,id_anio_fabricacion)
+					VALUES ('aaaaa','NINGUNO','2022-01-01','2022-06-30','AD278FX','NO_VIGENTE',
+							90000,'3528000000002','SEMESTRAL','aaaaa',15091,60000,1,1,1,1,1,1);
+
+INSERT INTO poliza (motor,cantidad_siniestros,fecha_inicio_vigencia,fecha_fin_vigencia,patente,estado,
+					km_por_anio,nro_poliza,forma_pago,chasis,valor_descuento,valor_premio,id_modelo,id_localidad,
+					id_parametro_poliza,id_cliente,id_tipo_cobertura,id_anio_fabricacion)
+					VALUES ('aaaaa','NINGUNO','2022-07-01','2022-12-31','AD278FX','NO_VIGENTE',
+							100000,'3528000000003','SEMESTRAL','aaaaa',15091,60000,1,1,1,1,1,1);
+
+INSERT INTO poliza (motor,cantidad_siniestros,fecha_inicio_vigencia,fecha_fin_vigencia,patente,estado,
+					km_por_anio,nro_poliza,forma_pago,chasis,valor_descuento,valor_premio,id_modelo,id_localidad,
+					id_parametro_poliza,id_cliente,id_tipo_cobertura,id_anio_fabricacion)
+					VALUES ('aaaaa','NINGUNO','2023-01-01','2023-06-30','AD278FX','NO_VIGENTE',
+							110000,'3528000000004','SEMESTRAL','aaaaa',15091,60000,1,1,1,1,1,1);
+
+INSERT INTO poliza (motor,cantidad_siniestros,fecha_inicio_vigencia,fecha_fin_vigencia,patente,estado,
+					km_por_anio,nro_poliza,forma_pago,chasis,valor_descuento,valor_premio,id_modelo,id_localidad,
+					id_parametro_poliza,id_cliente,id_tipo_cobertura,id_anio_fabricacion)
+					VALUES ('aaaaa','NINGUNO','2023-07-01','2023-12-31','AD278FX','VIGENTE',
+							120000,'3528000000005','SEMESTRAL','aaaaa',15091,60000,1,1,1,1,1,1);
+
+-- INSERT DE PAGO
+INSERT INTO pago (nro_poliza,nro_recibo,fecha_hora,importe,vuelto,id_usuario)
+			VALUES ('3528000000000','0000000001','2020-12-31 12:00:00',45273,0,2);
+INSERT INTO pago (nro_poliza,nro_recibo,fecha_hora,importe,vuelto,id_usuario)
+			VALUES ('3528000000001','0000000002','2021-06-30 12:00:00',45273,0,2);
+INSERT INTO pago (nro_poliza,nro_recibo,fecha_hora,importe,vuelto,id_usuario)
+			VALUES ('3528000000002','0000000003','2021-12-31 12:00:00',45273,0,2);
+INSERT INTO pago (nro_poliza,nro_recibo,fecha_hora,importe,vuelto,id_usuario)
+			VALUES ('3528000000003','0000000004','2022-06-30 12:00:00',45273,0,2);
+INSERT INTO pago (nro_poliza,nro_recibo,fecha_hora,importe,vuelto,id_usuario)
+			VALUES ('3528000000004','0000000005','2022-12-31 12:00:00',45273,0,2);
+INSERT INTO pago (nro_poliza,nro_recibo,fecha_hora,importe,vuelto,id_usuario)
+			VALUES ('3528000000005','0000000006','2023-06-30 12:00:00',45273,0,2);
+
+-- INSERT DE CUOTA
+INSERT INTO cuota (nro_cuota,estado,mes_abonado,estado_pago_cuota,recargo_mora,ultimo_dia_de_pago,
+					bonificacion_pago_adelantado,anio_abonado,monto,id_poliza,id_pago)
+					VALUES (1,'PAGO','ENERO','EN_TERMINO',0,'2020-12-31',0,'2021',45273,1,1);
+
+INSERT INTO cuota (nro_cuota,estado,mes_abonado,estado_pago_cuota,recargo_mora,ultimo_dia_de_pago,
+					bonificacion_pago_adelantado,anio_abonado,monto,id_poliza,id_pago)
+					VALUES (1,'PAGO','JULIO','EN_TERMINO',0,'2021-06-30',0,'2021',45273,2,2);
+
+INSERT INTO cuota (nro_cuota,estado,mes_abonado,estado_pago_cuota,recargo_mora,ultimo_dia_de_pago,
+					bonificacion_pago_adelantado,anio_abonado,monto,id_poliza,id_pago)
+					VALUES (1,'PAGO','ENERO','EN_TERMINO',0,'2021-12-31',0,'2022',45273,3,3);
+
+INSERT INTO cuota (nro_cuota,estado,mes_abonado,estado_pago_cuota,recargo_mora,ultimo_dia_de_pago,
+					bonificacion_pago_adelantado,anio_abonado,monto,id_poliza,id_pago)
+					VALUES (1,'PAGO','JULIO','EN_TERMINO',0,'2022-06-30',0,'2022',45273,4,4);
+
+INSERT INTO cuota (nro_cuota,estado,mes_abonado,estado_pago_cuota,recargo_mora,ultimo_dia_de_pago,
+					bonificacion_pago_adelantado,anio_abonado,monto,id_poliza,id_pago)
+					VALUES (1,'PAGO','ENERO','EN_TERMINO',0,'2022-12-31',0,'2023',45273,5,5);
+
+INSERT INTO cuota (nro_cuota,estado,mes_abonado,estado_pago_cuota,recargo_mora,ultimo_dia_de_pago,
+					bonificacion_pago_adelantado,anio_abonado,monto,id_poliza,id_pago)
+					VALUES (1,'PAGO','JULIO','EN_TERMINO',0,'2023-06-30',0,'2023',45273,6,6);
