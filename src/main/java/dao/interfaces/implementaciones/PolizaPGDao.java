@@ -75,4 +75,19 @@ public class PolizaPGDao implements PolizaDao {
 		}	
 	}
 
+	@Override
+	public List<Poliza> findPolizasUltimosDosAñosByIdCliente(Integer id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+
+		//Se buscan todas las polizas que esten en el rango de 2 años del cliente
+		String hql = "select p from Poliza p where p.cliente.id = :id and (:fecha = p.fechaInicioVigencia or :fecha < p.fechaInicioVigencia or :fecha between p.fechaInicioVigencia and p.fechaFinVigencia)"; 
+		Query<Poliza> query = session.createQuery(hql, Poliza.class);
+		query.setParameter("id", id);
+		query.setParameter("fecha", LocalDate.now().minusYears(2));
+		List<Poliza> polizas  = query.getResultList();
+		
+		session.close();
+		
+		return polizas;
+	}
 }

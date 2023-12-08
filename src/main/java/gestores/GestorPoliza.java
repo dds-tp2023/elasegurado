@@ -1,5 +1,6 @@
 package gestores;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -11,6 +12,7 @@ import dao.factory.FactoryDao;
 import dao.interfaces.ClienteDao;
 import dao.interfaces.GeograficoDao;
 import dao.interfaces.MedidaSeguridadDao;
+import dao.interfaces.PagoDao;
 import dao.interfaces.ParametroPolizaDao;
 import dao.interfaces.ParametroVehiculoDao;
 import dao.interfaces.PolizaDao;
@@ -53,6 +55,7 @@ public final class GestorPoliza {
 	private GeograficoDao geograficoDao;
 	private MedidaSeguridadDao medidaSeguridadDao;
 	private TipoCoberturaDao tipoCoberturaDao;
+	private PagoDao pagoDao;
 	private GestorSubsistemaSiniestro gestorSubsistemaSiniestro = GestorSubsistemaSiniestro.getInstancia();
 	
 	private GestorPoliza() {}
@@ -140,6 +143,7 @@ public final class GestorPoliza {
 		List<Cuota> cuotas = new ArrayList<Cuota>();
 		for(CuotaDTO unaCuota : datos.getCuotas()) {
 			Cuota c = new Cuota();
+			c.setNroCuota(unaCuota.getNroCuota());
 			c.setEstado(EstadoCuota.IMPAGO);
 			c.setMonto(unaCuota.getMonto());
 			c.setUltimoDiaPago(unaCuota.getUltimoDiaPago());
@@ -169,29 +173,55 @@ public final class GestorPoliza {
 		poliza.setEstado(EstadoPoliza.GENERADA);
 		String nroPoliza = generarNroPoliza(poliza);
 		poliza.setNroPoliza(nroPoliza);
-		cliente.addPoliza(poliza);
 		actualizarCondicionCliente(cliente);
+		cliente.addPoliza(poliza);
 		
 		polizaDao.save(poliza);
 	}
 
 	private void actualizarCondicionCliente(Cliente cliente) {
-		//TODO: Consultar condicion cliente
-		factory = FactoryDao.getFactory(FactoryDao.PG_FACTORY);
-		polizaDao = factory.getPolizaDao();
 		CantidadSiniestros cantSiniestros = CantidadSiniestros.valueOf(gestorSubsistemaSiniestro.getCantSiniestrosByNroCliente(cliente.getNroCliente()));
-		
-		if(cliente.getPoliza().size() == 1) {
+		pagoDao = factory.getPagoDao();
+		if(cliente.getPoliza().size() == 0) {
 			cliente.setCondicionCliente(CondicionCliente.NORMAL);
 		}else if(polizaDao.findPolizasVigentesByIdCliente(cliente.getId()).size() == 0) {
 			cliente.setCondicionCliente(CondicionCliente.NORMAL);
-		}else if(cantSiniestros != CantidadSiniestros.NINGUNO) {
-			//TODO: agregar cuotas impagas y antiguedad de 2 años
-			cliente.setCondicionCliente(CondicionCliente.NORMAL);
 		}else {
-			cliente.setCondicionCliente(CondicionCliente.PLATA);
+			boolean tieneSiniestros = cantSiniestros != CantidadSiniestros.NINGUNO;
+			boolean tieneCuotasImpagas = pagoDao.clienteTieneCuotasImpagasByIdCliente(cliente.getId());
+			boolean esClienteActivoIninterrumpido = clienteActivoIninterrumpido(cliente.getId());
+			if(tieneSiniestros || tieneCuotasImpagas || !esClienteActivoIninterrumpido) cliente.setCondicionCliente(CondicionCliente.NORMAL);
+			else cliente.setCondicionCliente(CondicionCliente.PLATA);
 		}
-		
+	}
+	
+	private boolean clienteActivoIninterrumpido(Integer idCliente) {
+		List<Poliza> polizas = polizaDao.findPolizasUltimosDosAñosByIdCliente(idCliente);
+		if(!polizas.isEmpty()) {
+			//Ordenar las polizas por fecha de inicio de vigencia
+			polizas.sort((p1,p2) -> p1.getFechaInicioVigencia().compareTo(p2.getFechaInicioVigencia()));
+
+			if(polizas.get(0).getFechaInicioVigencia().isAfter(LocalDate.now().minusYears(2))) {
+				//Significa que la primer poliza inicio despues de la fecha puesta desde hoy menos 2 años
+				return false;
+			}
+			if(polizas.get(polizas.size()-1).getFechaFinVigencia().isBefore(LocalDate.now())) {
+				//Significa que la ultima poliza se vencio y no hubo una renovacion o no se genero una nueva poliza
+				return false;
+			}
+			for(int i = 0; i<polizas.size(); i++) {
+				if(i+1 < polizas.size()) {
+					Poliza p = polizas.get(i);
+					Poliza siguiente = polizas.get(i+1);
+					if(p.getFechaFinVigencia().isBefore(siguiente.getFechaInicioVigencia()) && ChronoUnit.DAYS.between(p.getFechaFinVigencia(), siguiente.getFechaInicioVigencia()) > 1L) {
+						//Significa que una poliza se vencio y no se renovo o no se genero una nueva poliza
+						return false;
+					}
+				}
+			}
+			return true; //Significa que tuvo polizas desde hace 2 años hasta hoy
+		}
+		return false;
 	}
 	
 	private String generarNroPoliza(Poliza poliza) {

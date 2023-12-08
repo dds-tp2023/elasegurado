@@ -41,7 +41,12 @@ public class ClientePGDao implements ClienteDao {
 	public List<Cliente> buscarClientes(BusquedaClienteDTO criterios) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 
-		String consulta = "select c from Cliente c where c.condicionCliente = 'ACTIVO' and c.apellido like :apellido and c.nombre like :nombre ";
+		/*
+		 * Se busca sobre clientes no eliminados
+		 * El enunciado dice buscar sobre clientes ACTIVO solamente
+		 * Pero se estaria descartando los clientes con condicion NORMAL o PLATA
+		 */
+		String consulta = "select c from Cliente c where c.eliminado = false and c.apellido like :apellido and c.nombre like :nombre ";
 		if(!criterios.getNroCliente().equals(""))consulta+="and c.nroCliente = :nroCliente ";
 		if(!criterios.getTipoDocumento().equals("SELECCIONAR"))consulta+="and c.tipoDocumento = :tipoDocumento ";
 		if(!criterios.getDocumento().equals(""))consulta+="and c.nroDocumento = :nroDocumento ";
@@ -58,9 +63,5 @@ public class ClientePGDao implements ClienteDao {
 		List<Cliente> clientes = query.getResultList();
 		session.close();
 		return clientes;
-	}
-
-	
-
-	
+	}	
 }

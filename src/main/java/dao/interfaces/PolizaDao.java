@@ -7,5 +7,6 @@ import dominio.Poliza;
 public interface PolizaDao {
 	public abstract boolean existePolizaVigente(String patente, String motor, String chasis);
 	public abstract List<Poliza> findPolizasVigentesByIdCliente(Integer id);
+	public abstract List<Poliza> findPolizasUltimosDosAñosByIdCliente(Integer id);
 	public abstract void save(Poliza poliza);
 }
