@@ -36,7 +36,7 @@ INSERT INTO cliente(
 	fecha_nacimiento, condicion_de_iva, email, estado_civil, profesion, anio_registro, condicion,
 	eliminado, id_direccion)
 	VALUES ('54-00000000', 'Rodriguez', 'Lucas', 'DNI', '30123456', '20301234562', 'MASCULINO',
-		   '1970-10-20', 'CONSUMIDOR_FINAL', 'lucasrod@gmail.com', 'SOLTERO', 'ABOGADO', TO_DATE('2023', 'YYYY'), 'ACTIVO',
+		   '1970-10-20', 'CONSUMIDOR_FINAL', 'lucasrod@gmail.com', 'SOLTERO', 'ABOGADO', TO_DATE('2023', 'YYYY'), 'NORMAL',
 		   FALSE, 1);
 INSERT INTO cliente(
 	nro_cliente, apellido, nombre, tipo_documento, nro_documento, cuil, sexo,

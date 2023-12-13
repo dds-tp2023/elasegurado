@@ -1,5 +1,6 @@
 package dao.interfaces.implementaciones;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -7,6 +8,7 @@ import org.hibernate.query.Query;
 
 import dao.interfaces.ClienteDao;
 import dominio.Cliente;
+import dominio.Poliza;
 import dto.BusquedaClienteDTO;
 import enums.TipoDocumento;
 import utils.HibernateUtil;
@@ -28,13 +30,22 @@ public class ClientePGDao implements ClienteDao {
 	public Cliente findClienteByIdConPolizas(Integer id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		
-		Query<Cliente> query = session.createQuery("select c from Cliente c join fetch c.poliza where c.id = :id", Cliente.class);
+		Query<Poliza> query = session.createQuery("select p from Poliza p where p.cliente.id = :id", Poliza.class);
 		query.setParameter("id", id);
-		Cliente cliente = query.getSingleResultOrNull();
-		
-		session.close();
-		
-		return cliente;
+		List<Poliza> polizas = query.getResultList();
+		if(polizas.isEmpty()) {
+			Cliente cliente = findClienteById(id);
+			cliente.setPoliza(new ArrayList<Poliza>());
+			session.close();
+			return cliente;
+		}else {
+			Query<Cliente> query2 = session.createQuery("select c from Cliente c join fetch c.poliza where c.id = :id", Cliente.class);
+			query2.setParameter("id", id);
+			Cliente cliente = query2.getSingleResultOrNull();
+			
+			session.close();
+			return cliente;
+		}
 	}
 
 	@Override

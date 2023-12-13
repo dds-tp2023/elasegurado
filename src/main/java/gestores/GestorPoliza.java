@@ -1,6 +1,5 @@
 package gestores;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -76,11 +75,7 @@ public final class GestorPoliza {
 		boolean datosValidos = validarDatos(datos);
 		if(!datosValidos) throw new DatosNoValidosException("Los datos de póliza ingresados no son válidos:\n");
 		boolean existePolizaVigente = false;
-		if(datos.getPatente().equals("")) {
-			existePolizaVigente = polizaDao.existePolizaVigente(null, datos.getMotor(), datos.getChasis());
-		}else {
-			existePolizaVigente = polizaDao.existePolizaVigente(datos.getPatente(), datos.getMotor(), datos.getChasis());
-		}
+		existePolizaVigente = polizaDao.existePolizaVigente(datos.getPatente(), datos.getMotor(), datos.getChasis());
 		if(existePolizaVigente) throw new ExistePolizaVigenteException("Ya existe una póliza vigente asociado a los siguiente valores:\n");
 		return true;
 	}
@@ -98,22 +93,10 @@ public final class GestorPoliza {
 		boolean datosValidos = validarDatos(datos);
 		if(!datosValidos) throw new DatosNoValidosException("Los datos de póliza ingresados no son válidos:\n");
 		boolean existePolizaVigente = false;
-		if(datos.getDatosPoliza().getPatente().equals("")) {
-			existePolizaVigente = polizaDao.existePolizaVigente(null, datos.getDatosPoliza().getMotor(), datos.getDatosPoliza().getChasis());
-		}else {
-			existePolizaVigente = polizaDao.existePolizaVigente(datos.getDatosPoliza().getPatente(), datos.getDatosPoliza().getMotor(), datos.getDatosPoliza().getChasis());
-		}
+		existePolizaVigente = polizaDao.existePolizaVigente(datos.getDatosPoliza().getPatente(), datos.getDatosPoliza().getMotor(), datos.getDatosPoliza().getChasis());
 		if(existePolizaVigente) throw new ExistePolizaVigenteException("Ya existe una póliza vigente asociado a los siguiente valores:\n");
 		
 		Cliente cliente = clienteDao.findClienteByIdConPolizas(datos.getDatosPoliza().getIdCliente());
-		if(cliente == null) {
-			/**
-			 * Significa que no tiene polizas asociadas
-			 * Hay que saber la cantidad de polizas que tiene un cliente para actualizar su estado
-			 */
-			cliente = clienteDao.findClienteById(datos.getDatosPoliza().getIdCliente());
-			cliente.setPoliza(new ArrayList<Poliza>());
-		}
 		Localidad localidad = geograficoDao.findLocalidadById(datos.getDatosPoliza().getIdLocalidad());
 		Modelo modelo = parametroVehiculoDao.findModeloById(datos.getDatosPoliza().getIdModelo());
 		AnioFabricacion anioFabricacion = parametroVehiculoDao.findAnioFabricacionById(datos.getDatosPoliza().getIdAnioFabricacion());

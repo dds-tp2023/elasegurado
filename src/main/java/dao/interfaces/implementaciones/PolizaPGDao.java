@@ -19,8 +19,8 @@ public class PolizaPGDao implements PolizaDao {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		
 		Poliza poliza = null;
-		LocalDate date = LocalDate.now().plusDays(1);
-		if(patente != null) {
+		LocalDate date = LocalDate.now().plusDays(1);//Se le agrega un dia, porque puede darse el caso que el mismo agregué una póliza y entra en vigencia como minimo el dia siguiente
+		if(!patente.equals("")) {
 			String hql = "from Poliza p where p.patente = :patente and p.motor = :motor and p.chasis = :chasis and :date between p.fechaInicioVigencia and p.fechaFinVigencia";
 			Query<Poliza> query = session.createQuery(hql,Poliza.class);
 			query.setParameter("patente", patente);

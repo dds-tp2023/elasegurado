@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument;
 
 import dto.BusquedaClienteDTO;
 import dto.ClienteDTO;
@@ -33,6 +36,7 @@ import gestores.GestorCliente;
 import ui.menus.MenuProductorSeguro;
 import ui.poliza.PolizaAlta1;
 import utils.DocumentFilterLimit;
+import utils.NumClienteFormatFilter;
 
 @SuppressWarnings("serial")
 public class ClienteConsulta extends JPanel {
@@ -61,6 +65,7 @@ public class ClienteConsulta extends JPanel {
 	private DefaultTableModel modeloTablaResultadoBusqueda;
 	private JScrollPane scrollTablaResultadoBusqueda;
 	private JButton btnPaginaAnterior;
+	private JTextField txtPaginaActual;
 	private JButton btnPaginaSiguiente;
 	private JButton btnSeleccionar;
 	private JButton btnCancelar;
@@ -117,8 +122,7 @@ public class ClienteConsulta extends JPanel {
 		panelBusquedaCliente.add(lblNumCliente, gbcBusquedaCliente);
 		
 		txtNumCliente = new JTextField();
-		// Limitar la cantidad de caracteres usando un DocumentFilter
-		txtNumCliente.setDocument(new DocumentFilterLimit(11));
+		((AbstractDocument) txtNumCliente.getDocument()).setDocumentFilter(new NumClienteFormatFilter(11));
 		gbcBusquedaCliente.gridx = 1;
 		gbcBusquedaCliente.gridy = 0;
 		gbcBusquedaCliente.weightx = 0.33;
@@ -226,6 +230,10 @@ public class ClienteConsulta extends JPanel {
 				mensajeCriterioDeBusqueda();
 			}
 			else {
+				btnPaginaAnterior.setEnabled(false);
+				btnPaginaSiguiente.setEnabled(false);
+				txtPaginaActual.setEnabled(false);
+				
 				BusquedaClienteDTO criterios = new BusquedaClienteDTO();
 				criterios.setNroCliente(txtNumCliente.getText());
 				criterios.setApellido(txtApellido.getText());
@@ -235,6 +243,9 @@ public class ClienteConsulta extends JPanel {
 				clientesDTO = gestorCliente.buscarClienteSegunCriterio(criterios);
 				if(clientesDTO.size()==0) {
 					modeloTablaResultadoBusqueda.setRowCount(0);
+					for (int i = 0; i < 10; i++) {
+						modeloTablaResultadoBusqueda.addRow(new Object[] { "" });
+					}
 					String mensaje = "No existen clientes que cumplen con los criterios ingresados";
 					int confirmado = JOptionPane.showOptionDialog(this, mensaje, "INFORMACIÓN", JOptionPane.YES_NO_OPTION,
 							JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Dar de Alta Cliente", "Aceptar" }, "Dar de Alta Cliente");
@@ -244,6 +255,7 @@ public class ClienteConsulta extends JPanel {
 						ventana.setVisible(true);
 					}
 				}else {
+					clientesDTO.sort((c1,c2) -> c1.getNroCliente().compareTo(c2.getNroCliente()));
 					try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/configuracion.txt"))) {
 			       
 						br.readLine();
@@ -255,10 +267,14 @@ public class ClienteConsulta extends JPanel {
 			        }
 					modeloTablaResultadoBusqueda.setRowCount(0);
 					for(int i = 0; i<cantidadRegistros; i++) {
+						if(clientesDTO.size()-1 < i) break;
 						ClienteDTO c = clientesDTO.get(i);
-						modeloTablaResultadoBusqueda.addRow(new Object[] { c.getId(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
+						modeloTablaResultadoBusqueda.addRow(new Object[] { c.getNroCliente(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
 					}
-					btnPaginaSiguiente.setEnabled(true);
+					if(clientesDTO.size() > cantidadRegistros) {
+						txtPaginaActual.setEnabled(true);
+						btnPaginaSiguiente.setEnabled(true);
+					}
 				}
 			
 			}
@@ -302,17 +318,17 @@ public class ClienteConsulta extends JPanel {
         int rowHeight = tablaResultadoBusqueda.getRowHeight();
         int numRowsToShow = 10; //El tamaño de la tabla es de 10 filas, si tiene más se desplaza con la barra
         tablaResultadoBusqueda.setPreferredScrollableViewportSize(new Dimension(tablaResultadoBusqueda.getPreferredSize().width, rowHeight * numRowsToShow));
-             
+        
         scrollTablaResultadoBusqueda = new JScrollPane(tablaResultadoBusqueda);
         gbcResultadoBusqueda.gridx = 0;
         gbcResultadoBusqueda.gridy = 0;
-        gbcResultadoBusqueda.gridwidth = 2;
+        gbcResultadoBusqueda.gridwidth = 3;
         gbcResultadoBusqueda.weightx = 1;
         gbcResultadoBusqueda.fill = GridBagConstraints.HORIZONTAL;
         gbcResultadoBusqueda.insets = new Insets(10, 10, 10, 10);
         panelResultadoBusqueda.add(scrollTablaResultadoBusqueda, gbcResultadoBusqueda);
         
-     // Crear botones de paginación
+        // Crear botones de paginación
         btnPaginaAnterior = new JButton("Anterior");
         btnPaginaAnterior.setEnabled(false);
         gbcResultadoBusqueda.gridx = 0;
@@ -328,11 +344,31 @@ public class ClienteConsulta extends JPanel {
                 paginaAnterior();
             }
         });
+        
+        txtPaginaActual = new JTextField(2);
+        txtPaginaActual.setText(paginaActual+"");
+        txtPaginaActual.setEnabled(false);
+        gbcResultadoBusqueda.gridx = 1;
+        gbcResultadoBusqueda.gridy = 1;
+        gbcResultadoBusqueda.weightx = 0;
+        gbcResultadoBusqueda.anchor = GridBagConstraints.CENTER;
+        panelResultadoBusqueda.add(txtPaginaActual, gbcResultadoBusqueda);
+        txtPaginaActual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!(Character.isDigit(c) || (c == KeyEvent.VK_BACK_SPACE) || (c == KeyEvent.VK_DELETE))) {
+                    e.consume();
+                }
+            }
+        });
+        txtPaginaActual.addActionListener(e -> goToPage());
 
         btnPaginaSiguiente = new JButton("Siguiente");
         btnPaginaSiguiente.setEnabled(false);
-        gbcResultadoBusqueda.gridx = 1;
+        gbcResultadoBusqueda.gridx = 2;
         gbcResultadoBusqueda.gridy = 1;
+        gbcResultadoBusqueda.weightx = 0.5;
 		gbcResultadoBusqueda.anchor = GridBagConstraints.WEST;
 		panelResultadoBusqueda.add(btnPaginaSiguiente, gbcResultadoBusqueda);
         btnPaginaSiguiente.addActionListener(new ActionListener() {
@@ -354,7 +390,11 @@ public class ClienteConsulta extends JPanel {
 			if(tablaResultadoBusqueda.getSelectedRow() == -1) {
 				mensajeSeleccionarCliente();
 			}else {
-				Integer id = (Integer) tablaResultadoBusqueda.getValueAt(tablaResultadoBusqueda.getSelectedRow(), 0);
+				String nroCliente = (String) tablaResultadoBusqueda.getValueAt(tablaResultadoBusqueda.getSelectedRow(), 0);
+				Integer id = null;
+				for(ClienteDTO c : clientesDTO) {
+					if(c.getNroCliente().equals(nroCliente)) id = c.getId();
+				}
 				ClienteDTO clienteDTO = gestorCliente.findCliente(id); 
 				ventana.setTitle("Póliza - Alta - 1");
 				ventana.setContentPane(new PolizaAlta1(ventana, new MenuProductorSeguro(ventana,usuarioDTO), usuarioDTO, clienteDTO));
@@ -419,7 +459,7 @@ public class ClienteConsulta extends JPanel {
         modeloTablaResultadoBusqueda.setRowCount(0);
 		for(int i = startRow; i<endRow; i++) {
 			ClienteDTO c = clientesDTO.get(i);
-			modeloTablaResultadoBusqueda.addRow(new Object[] { c.getId(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
+			modeloTablaResultadoBusqueda.addRow(new Object[] { c.getNroCliente(),c.getApellido(),c.getNombre(),c.getTipoDocumento(),c.getDocumento()});
 		}
 		if((paginaActual + 1) * cantidadRegistros >= clientesDTO.size()) btnPaginaSiguiente.setEnabled(false);
     }
@@ -434,5 +474,31 @@ public class ClienteConsulta extends JPanel {
         }
         if(paginaActual != 0) btnPaginaAnterior.setEnabled(true);
 	}
+	
+	private void goToPage() {
+		try {
+            int pageNumber = Integer.parseInt(txtPaginaActual.getText());
+            setCurrentPage(pageNumber);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un número válido para la página.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtPaginaActual.setText("");
+        }
+	}
 
+	private void setCurrentPage(int pageNumber) {
+		int totalRows = clientesDTO.size();
+        int maxPages = (int) Math.ceil((double) totalRows / cantidadRegistros);
+        if (pageNumber >= 0 && pageNumber < maxPages) {
+        	paginaActual = pageNumber;
+        	updateTable();
+        	if(paginaActual == 0) {
+    			btnPaginaAnterior.setEnabled(false);
+    			btnPaginaSiguiente.setEnabled(true);
+    		}
+        	if(paginaActual != 0) btnPaginaAnterior.setEnabled(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Número de página fuera de rango.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtPaginaActual.setText("");
+        }
+	}
 }
